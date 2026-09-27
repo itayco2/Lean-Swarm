@@ -16,7 +16,7 @@ Claude Code loads agent definitions only when a session starts. The lean roles m
 
 1. **Start a session with the plugin loaded,** in the repo root:
    - **Local:** `claude --plugin-dir .`
-   - **Or install it:** `/plugin marketplace add itayco2/Token-Optimizer`, then `/plugin install lean-swarm@lean-swarm`, then start a new session.
+   - **Or install it:** `/plugin marketplace add itayco2/Lean-Swarm`, then `/plugin install lean-swarm@lean-swarm`, then start a new session.
 
 2. **Check the roles** (about a minute). Ask Claude:
 

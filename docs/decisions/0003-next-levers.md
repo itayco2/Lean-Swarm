@@ -49,4 +49,4 @@ Both "build" levers went through the [quality series](../proof/2026-09-27-qualit
 
 - X-ray is the part nobody else has: ccusage rejected a per-subagent breakdown, and codeburn says it can't tell whether delegation was cheaper. X-ray should grow the analyses above (cost by kind per agent, first-turn write share, independent single-call turns, trimming risk) so each user sees which lever pays on *their* workload; review work and the author's history already disagree.
 - Output compression is crowded (headroom, rtk, context-mode, squeez, omni) and mostly measured in bytes/4 without quality tests. Don't compete there.
-- `alexgreensh/token-optimizer` (~2.4k stars, PolyForm Noncommercial) is the closest project and has this repo's name. Pick the public name (spec Q7) before announcing.
+- `alexgreensh/token-optimizer` (~2.4k stars, PolyForm Noncommercial) is the closest project and shared this repo's former name, Token-Optimizer. The repo was renamed Lean-Swarm on 2026-09-27.

@@ -2,8 +2,6 @@
 
 **See where your Claude Code multi-agent runs spend tokens, and cut them without making the agents worse.**
 
-> "Lean-Swarm" is a working name.
-
 When Claude Code runs several agents at once (workflows or parallel subagents), almost none of the tokens are the agents' own work. Measured with X-ray across 254 runs and 2,459 agents on one heavy setup (2026-09-26):
 
 - **10.25 billion tokens read, 72 million written (0.7%).** Agents mostly re-read context.
@@ -42,7 +40,7 @@ Same 7-agent review workflow (3 reviewers → 3 checkers → 1 judge), same prom
 Needs Node 22 or later. It only reads your local logs; it changes nothing and sends nothing anywhere.
 
 ```
-npx github:itayco2/Token-Optimizer xray
+npx github:itayco2/Lean-Swarm xray
 ```
 
 Or from a clone: `node bin/lean-swarm.js xray`.
@@ -78,7 +76,7 @@ A tools allowlist also drops the skill listing and the deferred-tool listing, so
 **Install:**
 
 ```
-/plugin marketplace add itayco2/Token-Optimizer
+/plugin marketplace add itayco2/Lean-Swarm
 /plugin install lean-swarm@lean-swarm
 ```
 
@@ -119,7 +117,6 @@ Measured on the long-agent runs, the real workflow history and the quality serie
 - **Quality was tested on code review at length and on coding briefly,** each on one codebase, with one model. Research agents weren't tested. The kit is there to test yours.
 - **Anthropic is changing this area.** `omitClaudeMd` shipped in 2.1.271, and requests to trim subagent context are open. X-ray stays useful either way.
 - **Single-session chat gains little.** Other tools cover that.
-- **The name "Token-Optimizer" is also used by an unrelated project** (alexgreensh/token-optimizer). The public name isn't settled.
 
 ## More
 

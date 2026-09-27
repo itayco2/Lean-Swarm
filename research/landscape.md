@@ -8,7 +8,7 @@ From a web sweep of 81 repos; the ones that matter to Lean-Swarm are below. Star
 |---|---|---|---|
 | ccusage/ccusage (~18.7k★) | MIT | Usage reports from local logs | Accounting only; a per-plugin/sidechain breakdown PR was rejected (2026-09-15) |
 | getagentseal/codeburn (~11.3k★) | MIT | Spend by model, project, subagent type | Attribution only; says it can't tell if delegation was cheaper |
-| alexgreensh/token-optimizer (~2.4k★) | PolyForm NC | Plugin: audit, bash compression, archive-and-expand, subagent cost breakdown | ~28% of one author's workload avoided, mostly estimated; no A/B. **Same name as this repo.** |
+| alexgreensh/token-optimizer (~2.4k★) | PolyForm NC | Plugin: audit, bash compression, archive-and-expand, subagent cost breakdown | ~28% of one author's workload avoided, mostly estimated; no A/B. Shared this repo's former name, which is why it is now Lean-Swarm. |
 
 ## Trimming tool output
 
