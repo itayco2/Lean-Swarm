@@ -1,6 +1,82 @@
 # Lean-Swarm
 
-**See where your Claude Code multi-agent runs spend tokens, and cut them without making the agents worse.**
+**A free Claude Code plugin that cuts the tokens of multi-agent runs, like ultracode, without making the agents worse.**
+
+**[בעברית](#בעברית)**
+
+## Install
+
+In Claude Code:
+
+```
+/plugin marketplace add itayco2/Lean-Swarm
+/plugin install lean-swarm@lean-swarm
+```
+
+Start a new session. That's it: the workflows Claude writes for you, ultracode included, now use five lean agent types (reader, researcher, coder, reviewer, judge) that load only the tools they use. A review agent starts with about 6k tokens instead of about 52k.
+
+From a terminal, the same commands work with `claude plugin` in place of `/plugin`. To remove it: `claude plugin uninstall lean-swarm@lean-swarm`.
+
+**What it did in our test:** the same ultracode prompt ("review this library for bugs") on a 15,000-line library with 13 planted bugs, Claude Code 2.1.281, Opus 5.5, one run each, nothing set up besides the install:
+
+| | Default agents | With Lean-Swarm |
+|---|---:|---:|
+| Agents | 10 | 15, all lean |
+| First turn per agent (median) | 52.6k | 6.5k |
+| Tokens read by the agents | 11.5M | 4.2M (−64%) |
+| Session cost (API prices) | $10.58 | $6.44 (−39%) |
+| Planted bugs found | 13 of 13 | 13 of 13 |
+
+One run per side, so treat the numbers as an example ([write-up](docs/proof/2026-09-27-ultracode.md)); the [Results](#results) below come from repeated runs.
+
+**What it adds to every session:** about 500 tokens, for the five agent descriptions and one line at session start that tells Claude to use them in the workflows it writes. On a small job, ultracode may do the work itself without starting agents; then the plugin changes nothing.
+
+## See where your tokens go (optional)
+
+X-ray reads your local Claude Code logs and shows where the tokens of your multi-agent runs go, and what lean roles would save. It needs Node 22 or later, changes and sends nothing, and hides project names and paths unless you add `--show-paths`.
+
+```
+npx github:itayco2/Lean-Swarm xray
+```
+
+It needs at least one past run with subagents or a workflow. After your next workflow with the plugin, the "Fixed start by agent type" table should list `lean-swarm:` agent types.
+
+<div dir="rtl">
+
+## בעברית
+
+פלאגין חינמי בקוד פתוח ל-Claude Code, שחותך את הטוקנים של ריצות עם כמה סוכנים, כמו ultracode, בלי לפגוע בתוצאה.
+
+**התקנה.** בתוך Claude Code מריצים:
+
+<div dir="ltr">
+
+```
+/plugin marketplace add itayco2/Lean-Swarm
+/plugin install lean-swarm@lean-swarm
+```
+
+</div>
+
+פותחים סשן חדש, וזהו. מעכשיו ה-workflows ש-Claude כותב, כולל ultracode, משתמשים בחמישה סוגי סוכנים רזים שטוענים רק את הכלים שהם צריכים. סוכן בדיקת קוד מתחיל עם כ-6 אלף טוקנים במקום כ-52 אלף.
+
+בבדיקה שלנו, אותו פרומפט של ultracode על ספרייה של 15 אלף שורות: עם הפלאגין הסוכנים קראו בערך שליש מהטוקנים, הריצה עלתה בערך 40% פחות, ושתי הריצות מצאו את כל 13 הבאגים ששתלנו. ריצה אחת לכל צד, הטבלה המלאה באנגלית למעלה.
+
+הפלאגין מוסיף כ-500 טוקנים לכל סשן. להסרה, בטרמינל: `claude plugin uninstall lean-swarm@lean-swarm`
+
+**רוצים לראות לאן הולכים הטוקנים אצלכם?** זה לא חובה. צריך Node 22 ומעלה. הפקודה רק קוראת את הלוגים המקומיים של Claude Code, לא משנה שום קובץ ולא שולחת שום דבר החוצה:
+
+<div dir="ltr">
+
+```
+npx github:itayco2/Lean-Swarm xray
+```
+
+</div>
+
+</div>
+
+## Where the tokens go
 
 When Claude Code runs several agents at once (workflows or parallel subagents), almost none of the tokens are the agents' own work. Measured with X-ray across 254 runs and 2,459 agents on one heavy setup (2026-09-26):
 
@@ -82,13 +158,14 @@ A tools allowlist also drops the skill listing and the deferred-tool listing, so
 
 Then start a new session: agent definitions load only when a session starts.
 
-**Use:** in a workflow, `agent(prompt, { agentType: 'lean-swarm:reviewer' })`. In chat, ask Claude to use the `lean-swarm:reader` agent.
+**Use:** nothing to do. The plugin adds one line at session start that tells Claude to give the agents of the workflows it writes, ultracode included, the lean-swarm type that fits each step. In a workflow you write yourself, set it with `agent(prompt, { agentType: 'lean-swarm:reviewer' })`. In chat, ask Claude to use the `lean-swarm:reader` agent.
 
 **What to know:**
 
 - A role removes only tools the agent doesn't use, and structured output still works (checked). Agents that used PowerShell or a browser tool will use Bash or WebFetch instead.
 - `reviewer` and `judge` don't see your CLAUDE.md. If your project's CLAUDE.md holds context a reviewer needs, put it in the task prompt, or use `reader` or `coder`, which keep it.
 - `omitClaudeMd` needs Claude Code 2.1.271 or later; older versions ignore it and load the files as before.
+- The plugin adds about 500 tokens to every session: about 430 for the five agent descriptions and about 70 for the session-start line. The line reaches only the main session, not the agents it starts.
 
 ## Proof
 
@@ -99,6 +176,7 @@ Then start a new session: agent definitions load only when a session starts.
 | local | Windows, heavy setup | short, round-2 target | 3+3 | [local](docs/proof/2026-09-26-local-review.md) |
 | 4 | Windows, heavy setup | long (reviewers 15–27 turns), date-fns with 13 planted bugs + 6 decoys | 3+3 | [long agents](docs/proof/2026-09-26-long-agents.md) |
 | 5 | Windows, heavy setup | long, five variants in rotated blocks, plus a firmer nudge on its own | 37 | [quality series](docs/proof/2026-09-27-quality-series.md) |
+| ultracode | Windows, heavy setup | Claude writes the workflow: plain ultracode with default agents vs with the plugin installed, on round 4's target | 1+1 | [ultracode](docs/proof/2026-09-27-ultracode.md) |
 
 The kit to rerun any of it on your own setup, and to test your own changes as extra variants, is in [proof/](proof/).
 
