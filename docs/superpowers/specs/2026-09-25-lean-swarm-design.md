@@ -2,7 +2,7 @@
 
 - **Date:** 2026-09-25
 - **Status:** v1 in progress. X-ray, the lean roles and the proof kit are built. The proof run and the check on Itay's own logs remain; see the plan's status section.
-- **Name:** "Lean-Swarm" is a working name. Choose the public name before the repo goes public (Q5).
+- **Name:** Lean-Swarm (decided 2026-09-27; the repo was renamed from Token-Optimizer).
 - **Scope change:** the first draft had nine parts and a 12-task quality gate, which is weeks of work. v1 keeps the three parts that carry most of the value and take a few days. Everything else is in §9 "Later". The full first draft is in git history (commit `c669ccc`). Why: `docs/decisions/0001-cut-v1-scope.md`.
 
 ## 1. Problem
@@ -223,4 +223,4 @@ Q1–Q4 are answered in `docs/decisions/0002-open-questions.md`: Q1, Q2 and Q4 f
 - **Q2** When a role names WebFetch or WebSearch in `tools`, are they loaded directly, so the agent never needs ToolSearch?
 - **Q3** How does a workflow script name a plugin agent (`lean-swarm:reader`?), and does the role's tools list apply inside workflows?
 - **Q4** Do plain Agent-tool subagents write logs in the same format as workflow agents, so X-ray covers them?
-- **Q5** Final public name. The repo is currently `Token-Optimizer`, which clashes with the existing `token-optimizer` tool from §3.
+- **Q5** Final public name. **Decided 2026-09-27: Lean-Swarm**, matching the plugin, CLI and agent-type names. The repo was renamed from `Token-Optimizer`, which clashed with the existing `token-optimizer` tool from §3.

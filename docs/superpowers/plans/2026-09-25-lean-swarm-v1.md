@@ -21,7 +21,7 @@
 | 7. Check against the baseline | **Open, Itay's machine:** `node bin/lean-swarm.js xray --out out/baseline.md`, then compare with spec §2 |
 | 8. Lean roles | Done. Live roles check passed in a cloud session (`docs/proof/2026-09-25-roles-check.md`): every role started at 6.0k tokens or less, against 47.1k for a default agent, and returned structured output. **Open:** the same check with the installed plugin on Itay's machine |
 | 9. Proof run | Done in the cloud, two rounds (`docs/proof/`). Round 1: 6/6 bugs both ways, −83% tokens read, +16% wall-clock. Round 2 (harder target, decoys, 3 runs each): 11/11 both ways, −77%, +12%. **Open:** a run on Itay's own setup |
-| 10. README and release | README and license done. **Open:** public name (Q5), `npx` test from another machine, making the repo public |
+| 10. README and release | README and license done. Public name decided: Lean-Swarm (2026-09-27). **Open:** `npx` test from another machine, making the repo public |
 
 Changes from the plan as written:
 - **X-ray takes no `--all`:** plain `xray` reads every run.
@@ -212,7 +212,7 @@ docs/proof/                      the before/after write-up
 
 ## Task 10: README and release [anywhere]
 
-- [ ] Settle the public name (Q5), rename the repo and package, update the spec.
+- [x] Settle the public name (Q5), rename the repo and package, update the spec. (Lean-Swarm; the package was already named `lean-swarm`.)
 - [ ] README, in this order:
   - one sentence on what it does;
   - the one command: `npx github:itayco2/<repo> xray --all`;
