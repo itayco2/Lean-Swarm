@@ -7,7 +7,7 @@
   "files": ["bin/", "src/", "agents/", ".claude-plugin/", "README.md", "LICENSE"],
   "engines": { "node": ">=22" },
   "scripts": {
-    "test": "node --test --experimental-test-coverage --test-coverage-include=src/** --test-coverage-include=bin/**",
+    "test": "node --test --experimental-test-coverage --test-coverage-include=src/** --test-coverage-include=bin/** \"test/**/*.test.js\"",
     "xray": "node bin/lean-swarm.js xray"
   },
   "keywords": ["claude-code", "subagents", "workflows", "tokens", "context"],

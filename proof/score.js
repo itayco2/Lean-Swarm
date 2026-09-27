@@ -13,14 +13,38 @@ export const KEY = loadKey(path.join(HERE, 'grading', 'key.json'));
 
 const ROLE_TYPES = new Set(ROLES.flatMap(r => [r.name, 'lean-swarm:' + r.name]));
 const norm = f => String(f || '').split('\\').join('/').replace(/^\.\//, '');
-const sameFile = (reported, keyFile) => {
-  const r = norm(reported);
-  return r === keyFile || r.endsWith('/' + keyFile) || path.posix.basename(r) === path.posix.basename(keyFile);
-};
+// A path matches if it ends with the key's path. A bare file name ("cart.js") matches only when no
+// other key file has that name; in a library laid out as <fn>/index.js, a bare "index.js" could be
+// any of them.
+function fileMatcher(key) {
+  const names = {};
+  for (const x of [...key.bugs, ...(key.decoys || [])]) {
+    const b = path.posix.basename(x.file);
+    (names[b] = names[b] || new Set()).add(x.file);
+  }
+  return (reported, keyFile) => {
+    const r = norm(reported);
+    if (!r.includes('/')) return r === path.posix.basename(keyFile) && names[r].size === 1;
+    return r === keyFile || r.endsWith('/' + keyFile);
+  };
+}
 
 // Each planted bug matches at most one finding (the closest line in the same file) and vice versa.
+// Decoys are correct code that looks suspicious. A finding inside one is a false alarm, and it's
+// set aside before bug matching: a decoy can sit within a bug's line window (round 4 has two), and
+// a false alarm there must not count as finding the bug. No decoy range contains a bug line.
 export function scoreFindings(findings, key = KEY) {
-  const free = new Set(findings.map((_, i) => i));
+  const sameFile = fileMatcher(key);
+  const inRange = (f, d) => sameFile(f.file, d.file) && Number(f.line) >= d.lines[0] && Number(f.line) <= d.lines[1];
+  const decoys = key.decoys || [];
+  // Symptoms: lines where one planted bug's effects show up next to another planted bug. A finding
+  // there is real, but it isn't the neighbouring bug, so it's set aside too (not a false alarm).
+  const symptoms = key.symptoms || [];
+  const onDecoy = findings.map(f => decoys.some(d => inRange(f, d)));
+  const onSymptom = findings.map(f => symptoms.some(s => inRange(f, s)));
+  const decoyHits = decoys.filter(d => findings.some(f => inRange(f, d))).map(d => d.id);
+  const symptomHits = findings.filter((_, i) => onSymptom[i] && !onDecoy[i]).length;
+  const free = new Set(findings.map((_, i) => i).filter(i => !onDecoy[i] && !onSymptom[i]));
   const matched = [];
   const missed = [];
   for (const bug of key.bugs) {
@@ -33,11 +57,9 @@ export function scoreFindings(findings, key = KEY) {
     }
     if (best) { free.delete(best.i); matched.push({ bug: bug.id, finding: findings[best.i] }); } else missed.push(bug.id);
   }
-  const other = [...free].map(i => findings[i]);
-  // Decoys are correct code that looks suspicious. A finding inside one is a false alarm.
-  const decoyHits = (key.decoys || []).filter(d =>
-    other.some(f => sameFile(f.file, d.file) && Number(f.line) >= d.lines[0] && Number(f.line) <= d.lines[1])).map(d => d.id);
-  return { recall: matched.length / key.bugs.length, matched, missed, other, decoyHits };
+  // Everything not matched to a bug, decoy and symptom hits included, in report order.
+  const other = findings.filter((_, i) => free.has(i) || onDecoy[i] || onSymptom[i]);
+  return { recall: matched.length / key.bugs.length, matched, missed, other, decoyHits, symptomHits };
 }
 
 function jsonl(file) {
