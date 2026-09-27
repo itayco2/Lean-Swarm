@@ -34,6 +34,7 @@ const PART_NAMES = {
   instructions: 'Instruction files (CLAUDE.md)',
   memory: 'MEMORY files',
   rules: 'Rules files',
+  managed: 'Managed policy files',
   skillListing: 'Skill listing',
   deferredTools: 'Deferred-tool listing',
   task: 'Task',
@@ -110,7 +111,8 @@ export function markdown(s, opts = {}) {
 
   out.push('## What you could cut');
   out.push('Each lean role loads only the tools it lists, which also drops the skill listing and the deferred-tool listing. ' +
-    'The saving is re-read on every turn, so it counts once per turn. A range means the log does not hold the tool definitions.' +
+    'The reviewer and judge roles also start without CLAUDE.md and rules files (omitClaudeMd; managed policy files stay); MEMORY.md is reported to go with them but wasn\'t measured, so it counts toward the high end only. ' +
+    'The saving is re-read on every turn, so it counts once per turn. A range means the log does not hold the tool definitions, or MEMORY.md is part of the saving.' +
     (s.lean.floor > 0 ? ` The high end leaves out ${fmtTokens(s.lean.floor)}, what your agents that already have an allowlist still start with outside the log.` : ''));
   out.push(table(['Agent type', 'Agents', 'Fits role', 'Median start', 'Saved per turn', 'Tokens read saved'], s.agentTypes.slice(0, top).map(t => [
     t.type,

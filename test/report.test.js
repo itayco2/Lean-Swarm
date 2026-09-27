@@ -45,7 +45,9 @@ test('markdown for logs that include tool definitions', () => {
   const md = markdown(legacy());
   assert.match(md, /Loaded but never called: Artifact \(1 agents\)/);
   assert.match(md, /\| Tool definitions \| 2\.3k \|/);
-  assert.match(md, /Lean roles would save:\*\* about 45% of tokens read \(8\.8k\)/);
+  // The agent fits the reviewer role, which omits CLAUDE.md (low end) and, reportedly, MEMORY.md (high end).
+  assert.match(md, /Lean roles would save:\*\* about 55%–59% of tokens read \(10\.8k–11\.6k\)/);
+  assert.match(md, /\| code-reviewer \| 1 \| reviewer \(100%\) \| 5\.0k \| 3\.6k–3\.9k \| 10\.8k–11\.6k \|/);
   assert.match(md, /^1970-01-01 to 1970-01-01$/m);
   assert.match(md, /Lines skipped: 2 unparseable line/);
   assert.match(md, /\| code-reviewer \| 1 \| reviewer \(100%\)/);

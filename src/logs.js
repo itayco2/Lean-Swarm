@@ -148,8 +148,12 @@ function usageOf(u) {
   };
 }
 
-function fileKind(p) {
+// Admin-managed policy files load for every agent, including roles with omitClaudeMd.
+const MANAGED = /(^|\/)(etc\/claude-code|Library\/Application Support\/ClaudeCode|Program Files\/ClaudeCode|ProgramData\/ClaudeCode)\//i;
+
+export function fileKind(p) {
   const s = String(p || '').split('\\').join('/');
+  if (MANAGED.test(s)) return 'managed';
   if (/(^|\/)MEMORY\.md$/i.test(s) || /\/memory\//i.test(s)) return 'memory';
   if (/\/rules\//i.test(s)) return 'rules';
   return 'instructions';
@@ -161,7 +165,7 @@ function isInstructionAttachment(a) {
 
 function firstTurnMakeup(lines, firstIdx, usage) {
   const parts = {
-    systemPrompt: 0, tools: 0, instructions: 0, memory: 0, rules: 0,
+    systemPrompt: 0, tools: 0, instructions: 0, memory: 0, rules: 0, managed: 0,
     skillListing: 0, deferredTools: 0, task: 0, otherAttachments: 0,
   };
   let toolSizes = null;

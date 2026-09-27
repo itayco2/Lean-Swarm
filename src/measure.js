@@ -61,20 +61,24 @@ export function unloggedFloor(agents) {
 // What a lean role would remove from this agent's start, per turn.
 // Exact when tool definitions are in the log. Otherwise a range: the listings alone (low), up to the
 // listings plus everything not in the log except the floor a lean agent keeps (high).
+// A role with omitClaudeMd also drops CLAUDE.md and rules files (measured on 2.1.281). MEMORY.md is
+// reported to go with them but wasn't measured, so it counts toward the high end only.
 export function leanSaving(agent, called, floor = 0) {
   const role = fitRole(called);
   const first = agent.firstTurn;
   if (!role || !first) return { role: role && role.name, low: 0, high: 0 };
-  if (isAllowlisted(first)) return { role: role.name, low: 0, high: 0 };
   const mk = makeup(first);
+  const omitted = role.omitClaudeMd ? (mk.instructions || 0) + (mk.rules || 0) : 0;
+  const memory = role.omitClaudeMd ? mk.memory || 0 : 0;
+  if (isAllowlisted(first)) return { role: role.name, low: omitted, high: omitted + memory };
   const listings = (mk.skillListing || 0) + (mk.deferredTools || 0);
   const tt = toolTokens(first);
   if (tt) {
     const keep = new Set([...role.tools, 'StructuredOutput', 'SubagentHandback']);
     const tools = Object.entries(tt).filter(([n]) => !keep.has(n)).reduce((a, [, v]) => a + v, 0);
-    return { role: role.name, low: listings + tools, high: listings + tools };
+    return { role: role.name, low: listings + tools + omitted, high: listings + tools + omitted + memory };
   }
-  return { role: role.name, low: listings, high: listings + Math.max(0, mk.notInLog - floor) };
+  return { role: role.name, low: listings + omitted, high: listings + omitted + memory + Math.max(0, mk.notInLog - floor) };
 }
 
 export function agentStats(agent) {
