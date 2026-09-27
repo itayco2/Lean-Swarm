@@ -1,7 +1,7 @@
 {
   "name": "lean-swarm",
-  "version": "0.2.0",
-  "description": "Lean agent roles for Claude Code multi-agent runs: each role loads only the tools it uses, so agents start with far less context.",
+  "version": "0.3.0",
+  "description": "Lean agent roles for Claude Code multi-agent runs: each role loads only the tools it uses, and a session-start line tells Claude to use them in the workflows it writes.",
   "author": { "name": "Itay Cohen" },
   "license": "MIT",
   "keywords": ["subagents", "workflows", "tokens", "context"]

@@ -1,3 +1,6 @@
 # Workflow scripts must keep LF endings: the Workflow tool rejects a script file with carriage returns,
 # and Git for Windows checks text files out with CRLF by default.
 *.js text eol=lf
+
+# Hook scripts run under bash, which chokes on carriage returns.
+hooks/* text eol=lf

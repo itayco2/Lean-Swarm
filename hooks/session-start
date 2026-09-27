@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# SessionStart hook: tells Claude to give the agents of the workflows it writes (ultracode included)
+# the lean-swarm types, so the roles get used with no setup after installing the plugin.
+# The text holds no quote, backslash or newline, so it goes into the JSON as it is.
+printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"When you write a workflow, give each agent the lean-swarm agent type that fits its step: lean-swarm:reader to map code, lean-swarm:researcher for web research, lean-swarm:coder to build or fix, lean-swarm:reviewer to review or check, lean-swarm:judge to decide or summarize."}}'
