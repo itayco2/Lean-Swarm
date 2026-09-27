@@ -1,11 +1,14 @@
 // The lean roles shipped in agents/*.md. A test keeps this list and the files in sync.
-// Ordered from fewest tools to most, so the first role that fits is the leanest.
+// Ordered from fewest tools to most, so the first role that fits needs the fewest tools. With
+// omitClaudeMd that is not always the smallest start: reviewer drops CLAUDE.md and reader keeps it.
+// omitClaudeMd: the role starts without CLAUDE.md and ~/.claude/rules files. Only roles that passed
+// the quality gate get it (docs/proof/2026-09-27-quality-series.md).
 export const ROLES = [
-  { name: 'judge', tools: ['Read'] },
-  { name: 'reader', tools: ['Read', 'Grep', 'Glob'] },
-  { name: 'reviewer', tools: ['Read', 'Grep', 'Glob', 'Bash'] },
-  { name: 'researcher', tools: ['WebSearch', 'WebFetch', 'Read', 'Grep', 'Glob', 'Bash'] },
-  { name: 'coder', tools: ['Read', 'Grep', 'Glob', 'Edit', 'Write', 'Bash'] },
+  { name: 'judge', tools: ['Read'], omitClaudeMd: true },
+  { name: 'reader', tools: ['Read', 'Grep', 'Glob'], omitClaudeMd: false },
+  { name: 'reviewer', tools: ['Read', 'Grep', 'Glob', 'Bash'], omitClaudeMd: true },
+  { name: 'researcher', tools: ['WebSearch', 'WebFetch', 'Read', 'Grep', 'Glob', 'Bash'], omitClaudeMd: false },
+  { name: 'coder', tools: ['Read', 'Grep', 'Glob', 'Edit', 'Write', 'Bash'], omitClaudeMd: false },
 ];
 
 // Tools a role never needs to list: StructuredOutput is added for workflow schemas,
@@ -25,7 +28,7 @@ export function normalizeCalled(tools) {
   return out;
 }
 
-// The leanest role whose tools cover every tool the agent called, or null.
+// The role with the fewest tools that covers every tool the agent called, or null.
 export function fitRole(calledTools) {
   const need = normalizeCalled(calledTools);
   return ROLES.find(r => [...need].every(t => r.tools.includes(t))) || null;

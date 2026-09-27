@@ -1,6 +1,6 @@
 {
   "name": "lean-swarm",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Lean agent roles for Claude Code multi-agent runs: each role loads only the tools it uses, so agents start with far less context.",
   "author": { "name": "Itay Cohen" },
   "license": "MIT",

@@ -71,9 +71,26 @@ test('leanSaving: exact when tool definitions are logged', () => {
   const a = parseAgent(AGENT_A, META_A);
   const s = leanSaving(a, new Set(['Read', 'Bash', 'Grep']));
   assert.equal(s.role, 'reviewer');
-  // Drops the skill listing, the deferred-tool listing and Artifact; keeps Read and Bash.
-  close(s.low, (5010 * (A.parts.skillListing + A.parts.deferredTools + 1308)) / A.chars);
+  // Drops the skill listing, the deferred-tool listing and Artifact; keeps Read and Bash. The
+  // reviewer omits CLAUDE.md and rules too; MEMORY.md counts toward the high end only.
+  close(s.low, (5010 * (A.parts.skillListing + A.parts.deferredTools + 1308 + A.parts.instructions + A.parts.rules)) / A.chars);
+  close(s.high - s.low, (5010 * A.parts.memory) / A.chars);
+});
+
+test('leanSaving: a role without omitClaudeMd keeps the instruction files', () => {
+  const a = parseAgent(AGENT_A, META_A);
+  const s = leanSaving(a, new Set(['Read', 'Grep', 'Glob']));
+  assert.equal(s.role, 'reader');
+  close(s.low, (5010 * (A.parts.skillListing + A.parts.deferredTools + 1308 + 204)) / A.chars);
   assert.equal(s.low, s.high);
+});
+
+test('leanSaving: an agent that already has an allowlist still saves its instruction files under a role that omits them', () => {
+  const agent = { firstTurn: { tokens: 12000, parts: { systemPrompt: 360, tools: 0, skillListing: 0, deferredTools: 0, instructions: 18000, rules: 7200, memory: 3600 }, toolSizes: null } };
+  const reviewer = leanSaving(agent, new Set(['Read', 'Bash']));
+  close(reviewer.low, (18000 + 7200) / 3.6);
+  close(reviewer.high, (18000 + 7200 + 3600) / 3.6);
+  assert.deepEqual(leanSaving(agent, new Set(['Read', 'Grep'])), { role: 'reader', low: 0, high: 0 });
 });
 
 test('leanSaving: nothing when no role fits or the agent is already lean', () => {

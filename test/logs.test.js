@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import test from 'node:test';
-import { findRuns, parseAgent, readKey, readRun, runFromDir, shellReadKeys, strLen } from '../src/logs.js';
+import { fileKind, findRuns, parseAgent, readKey, readRun, runFromDir, shellReadKeys, strLen } from '../src/logs.js';
 import { A, AGENT_A, AGENT_BROKEN, FIXTURES, META_A, WF_PROBE } from './helpers.js';
 
 test('parseAgent: one turn per message id, output from its last line', () => {
@@ -157,4 +157,26 @@ test('parseAgent: Bash reads become shell keys; duplicate reads count them', () 
     message: { id, usage: { input_tokens: 1 }, content: [{ type: 'tool_use', id: id + 't', name: 'Bash', input: { command: cmd } }] } });
   const a = parseAgent(line('m1', 'cat -n src/cart.js'), {});
   assert.deepEqual(a.turns[0].calls[0], { name: 'Bash', key: null, shellKeys: ['file:/repo/src/cart.js'] });
+});
+
+test('fileKind: managed policy files are their own kind, so a role with omitClaudeMd keeps them', () => {
+  assert.equal(fileKind('/etc/claude-code/CLAUDE.md'), 'managed');
+  assert.equal(fileKind('/Library/Application Support/ClaudeCode/CLAUDE.md'), 'managed');
+  assert.equal(fileKind('C:\\Program Files\\ClaudeCode\\CLAUDE.md'), 'managed');
+  assert.equal(fileKind('C:\\ProgramData\\ClaudeCode\\CLAUDE.md'), 'managed');
+  assert.equal(fileKind('C:\\Users\\me\\.claude\\CLAUDE.md'), 'instructions');
+  assert.equal(fileKind('/u/.claude/rules/ecc/common/security.md'), 'rules');
+  assert.equal(fileKind('/u/.claude/projects/p/memory/MEMORY.md'), 'memory');
+  const text = [
+    { type: 'user', timestamp: '2026-09-01T10:00:00.000Z', message: { role: 'user', content: 'task' } },
+    { type: 'attachment', timestamp: '2026-09-01T10:00:00.000Z', attachment: { type: 'instructions', files: [
+      { path: '/etc/claude-code/CLAUDE.md', content: 'p'.repeat(100) },
+      { path: '/u/.claude/CLAUDE.md', content: 'c'.repeat(50) },
+    ] } },
+    { type: 'assistant', timestamp: '2026-09-01T10:00:01.000Z', message: { id: 'm1', model: 'claude-opus-5-5', content: [{ type: 'text', text: 'ok' }],
+      usage: { input_tokens: 10, cache_read_input_tokens: 0, cache_creation_input_tokens: 1000, output_tokens: 5 } } },
+  ].map(x => JSON.stringify(x)).join('\n');
+  const parts = parseAgent(text, {}, 'a1').firstTurn.parts;
+  assert.equal(parts.managed, 100);
+  assert.ok(parts.instructions >= 50 && parts.instructions < 150, `instructions ${parts.instructions}`);
 });

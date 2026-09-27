@@ -84,7 +84,7 @@ export const A = {
   read: 15742,
   fixed: 5010 * 3,
   output: 120 + 80 + 200,
-  parts: { systemPrompt: 400, tools: 304 + 1308 + 204, instructions: 500 + 12 + 20 + 19, memory: 200, rules: 0, skillListing: 13 + 1000, deferredTools: 20 + 8 + 8, task: 15, otherAttachments: 0 },
+  parts: { systemPrompt: 400, tools: 304 + 1308 + 204, instructions: 500 + 12 + 20 + 19, memory: 200, rules: 0, managed: 0, skillListing: 13 + 1000, deferredTools: 20 + 8 + 8, task: 15, otherAttachments: 0 },
   time: { model: 2000 + 500 + 7000 + 8000, 'tool:Read': 500, 'tool:Bash': 2000 },
 };
 A.chars = Object.values(A.parts).reduce((x, y) => x + y, 0);

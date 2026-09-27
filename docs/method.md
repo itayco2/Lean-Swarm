@@ -6,7 +6,7 @@ X-ray reads Claude Code's local transcripts. It never changes them and never sen
 
 - **Workflow runs:** `~/.claude/projects/<project>/<session>/subagents/workflows/<run>/agent-<id>.jsonl`, plus `agent-<id>.meta.json` (agent type, label, workflow phase).
 - **Plain subagents** (the Agent tool): `~/.claude/projects/<project>/<session>/subagents/agent-<id>.jsonl` and `.meta.json`. X-ray groups one session's plain subagents as one run.
-- **One turn** is one model reply. Claude Code writes a reply as several lines with the same message id. X-ray counts the reply once: input and cache fields come from its first line with usage, and output tokens from the largest value seen on its lines.
+- **One turn** is one model reply. Claude Code writes a reply as several lines with the same message id. X-ray counts the reply once: input and cache fields come from its first line with usage, and output tokens from the largest value seen on its lines. The first line's output count is a partial snapshot (often single digits), so a tool that reads only the first line undercounts output many times over; the 2026-09-25 prototype scripts did (about 14×). Input and cache fields were identical on every line of all 382 replies checked in proof round 4. When a reply's final line is missing altogether (anthropics/claude-code#84223, about 7% of requests in one heavy history), its output is undercounted; that was worth about 2% of billed cost there.
 
 ## Tokens
 
@@ -62,8 +62,9 @@ The Opus share of a run = turns on an Opus model ÷ all turns. The prototype cou
 
 ## What you could cut
 
-- **Fitting a role:** each agent gets the leanest role whose tools cover every tool it called. The roles are in `src/roles.js`. StructuredOutput, SubagentHandback and ToolSearch don't count, because a role gets them anyway or doesn't need them. PowerShell counts as Bash.
-- **Saving per turn:** the skill listing and deferred-tool listing, plus the definitions of tools the role leaves out. Agents that already start without those listings already have a tools allowlist, so they save nothing.
+- **Fitting a role:** each agent gets the role with the fewest tools that covers every tool it called. Because reviewer and judge also drop CLAUDE.md, an agent fitted to reader could start smaller as a reviewer; X-ray still reports reader, the closer fit. The roles are in `src/roles.js`. StructuredOutput, SubagentHandback and ToolSearch don't count, because a role gets them anyway or doesn't need them. PowerShell counts as Bash.
+- **Saving per turn:** the skill listing and deferred-tool listing, plus the definitions of tools the role leaves out. Agents that already start without those listings already have a tools allowlist, so they save only what the next point adds.
+  - Roles marked `omitClaudeMd` in `src/roles.js` (reviewer and judge) also drop the instruction attachment: CLAUDE.md files and `~/.claude/rules` files. That was measured on Claude Code 2.1.281 (a Bash-only role: 15.7k → 3.2k first turn). MEMORY.md is reported to go with them but wasn't measured, so it counts toward the high end only; that's why a range can appear even where the log holds tool definitions.
   - Where the log holds tool definitions, this is exact, up to the character split.
   - Where it doesn't, it's a range. The low end is the listings alone. The high end is the listings plus everything not in the log, minus a floor: the median unlogged start of agents in your logs that already have an allowlist. Those agents show how much a lean agent still carries outside the log (its own few tool definitions and the like).
   - On the test run, the default agent's range is 7.5k–39.8k per turn. A 2-tool agent in the same session measured 36.4k less than the default (45.1k vs 8.7k), which falls inside the range.

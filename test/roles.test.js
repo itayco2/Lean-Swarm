@@ -42,6 +42,8 @@ test('agents/*.md match src/roles.js', () => {
     assert.equal(fields.name, role.name);
     assert.deepEqual(fields.tools.split(',').map(s => s.trim()), role.tools, `${role.name} tools`);
     assert.equal(fields.model, 'inherit');
+    assert.equal(fields.omitClaudeMd === 'true', role.omitClaudeMd, `${role.name} omitClaudeMd matches src/roles.js`);
+    if (role.omitClaudeMd) assert.match(fields.description, /without CLAUDE\.md/, `${role.name} tells the orchestrator it starts without CLAUDE.md`);
     assert.ok(fields.description.length > 40, `${role.name} has a useful description`);
     assert.ok(body.split('.').length <= 4, `${role.name} prompt stays short and neutral`);
   }
