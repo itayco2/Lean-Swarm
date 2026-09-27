@@ -16,11 +16,11 @@ Write-up: [2026-09-26-long-agents.md](2026-09-26-long-agents.md). Claude Code 2.
 ## SCORE
 | Run | Variant | Planted bugs found | Found | Missed | Other findings | Decoy hits | Touched answer key |
 |---|---|---:|---|---|---:|---|---|
-| wf_5a85c6b4-5d6 | plain | 13/13 | todate-no-clone, startofweek-same-day, eachday-drops-end, overlap-inclusive-asymmetric, addmonths-no-clamp, nextday-same-day, leapyear-400, quarter-january, isoday-sunday, withininterval-end, endofweek-nan, eachhour-step-nan, nearestto-range | – | 1 | 0 | no |
+| wf_5a85c6b4-5d6 | plain | 13/13 | todate-no-clone, startofweek-same-day, eachday-drops-end, overlap-inclusive-asymmetric, addmonths-no-clamp, nextday-same-day, leapyear-400, quarter-january, isoday-sunday, withininterval-end, endofweek-nan, eachhour-step-nan, nearestto-range | - | 1 | 0 | no |
 | wf_a17e2ff6-77f | lean | 12/13 | todate-no-clone, startofweek-same-day, eachday-drops-end, overlap-inclusive-asymmetric, nextday-same-day, leapyear-400, quarter-january, isoday-sunday, withininterval-end, endofweek-nan, eachhour-step-nan, nearestto-range | addmonths-no-clamp | 0 | 0 | no |
 | wf_e8fd2f31-2da | plain | 12/13 | todate-no-clone, startofweek-same-day, eachday-drops-end, overlap-inclusive-asymmetric, nextday-same-day, leapyear-400, quarter-january, isoday-sunday, withininterval-end, endofweek-nan, eachhour-step-nan, nearestto-range | addmonths-no-clamp | 1 | 0 | no |
 | wf_3255594b-736 | lean | 12/13 | todate-no-clone, startofweek-same-day, eachday-drops-end, overlap-inclusive-asymmetric, nextday-same-day, leapyear-400, quarter-january, isoday-sunday, withininterval-end, endofweek-nan, eachhour-step-nan, nearestto-range | addmonths-no-clamp | 0 | 0 | no |
-| wf_9314a77b-9c4 | plain | 13/13 | todate-no-clone, startofweek-same-day, eachday-drops-end, overlap-inclusive-asymmetric, addmonths-no-clamp, nextday-same-day, leapyear-400, quarter-january, isoday-sunday, withininterval-end, endofweek-nan, eachhour-step-nan, nearestto-range | – | 1 | 0 | no |
+| wf_9314a77b-9c4 | plain | 13/13 | todate-no-clone, startofweek-same-day, eachday-drops-end, overlap-inclusive-asymmetric, addmonths-no-clamp, nextday-same-day, leapyear-400, quarter-january, isoday-sunday, withininterval-end, endofweek-nan, eachhour-step-nan, nearestto-range | - | 1 | 0 | no |
 | wf_ec1c0940-da6 | lean | 12/13 | todate-no-clone, startofweek-same-day, eachday-drops-end, overlap-inclusive-asymmetric, nextday-same-day, leapyear-400, quarter-january, isoday-sunday, withininterval-end, endofweek-nan, eachhour-step-nan, nearestto-range | addmonths-no-clamp | 1 | 0 | no |
 
 ## COMPARE plain vs lean
@@ -40,11 +40,11 @@ Write-up: [2026-09-26-long-agents.md](2026-09-26-long-agents.md). Claude Code 2.
 | Fixed-start share of tokens read | 50% | 24% | -51% |
 | Turns per run | 61.7 | 65.7 | +6% |
 | Wall-clock per run (min) | 3.9 | 3.5 | -10% |
-| Unknown-tool errors | 0 | 0 | – |
+| Unknown-tool errors | 0 | 0 | - |
 
-A agent types: workflow-subagent ×21.
+A agent types: workflow-subagent x21.
 
-B agent types: lean-swarm:reviewer ×18, lean-swarm:judge ×3.
+B agent types: lean-swarm:reviewer x18, lean-swarm:judge x3.
 
 ## NOISE plain wf_5a85c6b4-5d6 vs wf_e8fd2f31-2da
 | Tokens read per run | 4.6M | 8.0M | +73% |
@@ -111,15 +111,15 @@ B agent types: lean-swarm:reviewer ×18, lean-swarm:judge ×3.
 | wf_ec1c0940-da6 | lean | 192.8 | report | 1 | 11.9 | 11.9 | 1 | 11.9 | 0.0 | 1581 | 121 | 19.1k | 0% |
 
 Tool calls per run:
-- wf_5a85c6b4-5d6 (plain): Bash ×42, StructuredOutput ×7, Read ×5, Glob ×2
-- wf_a17e2ff6-77f (lean): Bash ×46, Read ×13, StructuredOutput ×7, Glob ×1
-- wf_e8fd2f31-2da (plain): Bash ×50, Read ×16, StructuredOutput ×7, Glob ×3
-- wf_3255594b-736 (lean): Bash ×33, Read ×15, StructuredOutput ×7, Grep ×6, Glob ×3
-- wf_9314a77b-9c4 (plain): Bash ×42, Read ×9, StructuredOutput ×7, PowerShell ×1
-- wf_ec1c0940-da6 (lean): Bash ×43, Read ×15, StructuredOutput ×7, Grep ×3, Glob ×2
+- wf_5a85c6b4-5d6 (plain): Bash x42, StructuredOutput x7, Read x5, Glob x2
+- wf_a17e2ff6-77f (lean): Bash x46, Read x13, StructuredOutput x7, Glob x1
+- wf_e8fd2f31-2da (plain): Bash x50, Read x16, StructuredOutput x7, Glob x3
+- wf_3255594b-736 (lean): Bash x33, Read x15, StructuredOutput x7, Grep x6, Glob x3
+- wf_9314a77b-9c4 (plain): Bash x42, Read x9, StructuredOutput x7, PowerShell x1
+- wf_ec1c0940-da6 (lean): Bash x43, Read x15, StructuredOutput x7, Grep x3, Glob x2
 
 ## PREDICTION (plain runs only)
-- **Lean roles would save:** about 14%–40% of tokens read (2.7M–7.6M). See "What you could cut".
+- **Lean roles would save:** about 14%-40% of tokens read (2.7M-7.6M). See "What you could cut".
 
 ## Tokens by kind
 
@@ -192,7 +192,7 @@ Each lean role loads only the tools it lists, which also drops the skill listing
 
 | Agent type | Agents | Fits role | Median start | Saved per turn | Tokens read saved |
 |---|---:|---:|---:|---:|---:|
-| workflow-subagent | 21 | reviewer (81%) | 52.3k | 14.7k–41.5k | 2.7M–7.6M |
+| workflow-subagent | 21 | reviewer (81%) | 52.3k | 14.7k-41.5k | 2.7M-7.6M |
 
 Roles: **judge** (Read), **reader** (Read, Grep, Glob), **reviewer** (Read, Grep, Glob, Bash), **researcher** (WebSearch, WebFetch, Read, Grep, Glob, Bash), **coder** (Read, Grep, Glob, Edit, Write, Bash). "none" means the agent called a tool no role has.
 

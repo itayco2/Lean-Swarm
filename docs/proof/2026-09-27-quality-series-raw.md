@@ -8,12 +8,12 @@ Variants: **plain** = default workflow agents; **lean** = this repo's roles; **o
 
 | Variant | Runs | Bugs found (of 12 unambiguous; mean, range) | Recall vs plain (90% CI, points) | All 13 bugs | Other findings per run | Decoy hits | Tokens read per run | per turn | Turns per run | Cost per run | Wall-clock | Median first turn |
 |---|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| plain | 12 | 12.0/12 (12–12) | – | 12.2/13 | 0.5 | 0 | 6.61M | 103.5k | 63.9 | $4.98 | 3.5 min | 52.3k |
-| lean | 12 | 12.0/12 (12–12) | +0.0 (+0.0 to +0.0) | 12.0/13 | 0.2 | 0 | 4.74M (−28%) | 76.1k (−26%) | 62.3 | $4.28 (−14%) | 3.5 min (−0%) | 18.9k |
-| next | 5 | 12.0/12 (12–12) | +0.0 (+0.0 to +0.0) | 12.0/13 | 0.4 | 0 | 2.89M (−56%) | 56.2k (−46%) | 51.4 | $2.98 (−40%) | 3.0 min (−14%) | 5.6k |
-| omit | 5 | 12.0/12 (12–12) | +0.0 (+0.0 to +0.0) | 12.0/13 | 0.6 | 0 | 3.19M (−52%) | 54.5k (−47%) | 58.6 | $3.08 (−38%) | 3.0 min (−14%) | 5.6k |
-| mirror | 4 | 12.0/12 (12–12) | +0.0 (+0.0 to +0.0) | 12.0/13 | 0.0 | 0 | 4.24M (−36%) | 66.7k (−36%) | 63.5 | $3.87 (−22%) | 3.3 min (−7%) | 18.5k |
-| strong | 5 | 12.0/12 (12–12) | +0.0 (+0.0 to +0.0) | 12.0/13 | 0.8 | 0 | 2.92M (−56%) | 57.1k (−45%) | 51.2 | $3.07 (−38%) | 3.0 min (−15%) | 5.6k |
+| plain | 12 | 12.0/12 (12-12) | - | 12.2/13 | 0.5 | 0 | 6.61M | 103.5k | 63.9 | $4.98 | 3.5 min | 52.3k |
+| lean | 12 | 12.0/12 (12-12) | +0.0 (+0.0 to +0.0) | 12.0/13 | 0.2 | 0 | 4.74M (-28%) | 76.1k (-26%) | 62.3 | $4.28 (-14%) | 3.5 min (-0%) | 18.9k |
+| next | 5 | 12.0/12 (12-12) | +0.0 (+0.0 to +0.0) | 12.0/13 | 0.4 | 0 | 2.89M (-56%) | 56.2k (-46%) | 51.4 | $2.98 (-40%) | 3.0 min (-14%) | 5.6k |
+| omit | 5 | 12.0/12 (12-12) | +0.0 (+0.0 to +0.0) | 12.0/13 | 0.6 | 0 | 3.19M (-52%) | 54.5k (-47%) | 58.6 | $3.08 (-38%) | 3.0 min (-14%) | 5.6k |
+| mirror | 4 | 12.0/12 (12-12) | +0.0 (+0.0 to +0.0) | 12.0/13 | 0.0 | 0 | 4.24M (-36%) | 66.7k (-36%) | 63.5 | $3.87 (-22%) | 3.3 min (-7%) | 18.5k |
+| strong | 5 | 12.0/12 (12-12) | +0.0 (+0.0 to +0.0) | 12.0/13 | 0.8 | 0 | 2.92M (-56%) | 57.1k (-45%) | 51.2 | $3.07 (-38%) | 3.0 min (-15%) | 5.6k |
 
 Per-bug found rate:
 
@@ -117,17 +117,17 @@ Scored with `node proof/score-build.js` (112 hidden checks, strengthened after r
 | Fixed-start share of tokens read | 83% | 65% | -22% |
 | Turns per run | 38 | 38.5 | +1% |
 | Wall-clock per run (min) | 3.7 | 3.3 | -12% |
-| Unknown-tool errors | 0 | 0 | – |
+| Unknown-tool errors | 0 | 0 | - |
 
 ## Strong-nudge runs
 
 | # | Variant | Transcript dir | Started (UTC) | Workflow duration | Session cost, orchestrator included |
 |---:|---|---|---|---:|---:|
 | 1 | strong | wf_22367647-a36 | 2026-09-27T01:07:19 | 182.9 s | $3.07 |
-| 2 | strong | - | 2026-09-27T01:10:35 | – | $3.24 (error: account session usage limit reached) |
-| 3 | strong | - | 2026-09-27T01:13:19 | – | $0.00 (error: account session usage limit reached) |
-| 4 | strong | - | 2026-09-27T01:13:24 | – | $0.00 (error: account session usage limit reached) |
-| 5 | strong | - | 2026-09-27T01:13:30 | – | $0.00 (error: account session usage limit reached) |
+| 2 | strong | - | 2026-09-27T01:10:35 | - | $3.24 (error: account session usage limit reached) |
+| 3 | strong | - | 2026-09-27T01:13:19 | - | $0.00 (error: account session usage limit reached) |
+| 4 | strong | - | 2026-09-27T01:13:24 | - | $0.00 (error: account session usage limit reached) |
+| 5 | strong | - | 2026-09-27T01:13:30 | - | $0.00 (error: account session usage limit reached) |
 | 6 | strong | wf_2bfa09e1-d3b | 2026-09-27T04:22:56 | 165.8 s | $3.43 |
 | 7 | strong | wf_2da10afb-739 | 2026-09-27T04:25:56 | 148.0 s | $2.94 |
 | 8 | strong | wf_2a5c381c-186 | 2026-09-27T04:28:38 | 155.8 s | $3.27 |

@@ -17,10 +17,10 @@
 | 1. Open questions | Done in a cloud session instead of Itay's machine: `docs/decisions/0002`. Q3 is from the docs and gets checked live by the roles check in Task 8 |
 | 2. Skeleton | Done |
 | 3. Scripts and fixtures | Done. Fixtures are a scrubbed real 2.1.282 run plus hand-built 2.1.250-style transcripts in `test/helpers.js` |
-| 4–6. Log reader, measures, report | Done. 59 tests, 100% line coverage. Cross-checked against the prototypes on the same run (`docs/method.md`) |
+| 4-6. Log reader, measures, report | Done. 59 tests, 100% line coverage. Cross-checked against the prototypes on the same run (`docs/method.md`) |
 | 7. Check against the baseline | **Open, Itay's machine:** `node bin/lean-swarm.js xray --out out/baseline.md`, then compare with spec §2 |
 | 8. Lean roles | Done. Live roles check passed in a cloud session (`docs/proof/2026-09-25-roles-check.md`): every role started at 6.0k tokens or less, against 47.1k for a default agent, and returned structured output. **Open:** the same check with the installed plugin on Itay's machine |
-| 9. Proof run | Done in the cloud, two rounds (`docs/proof/`). Round 1: 6/6 bugs both ways, −83% tokens read, +16% wall-clock. Round 2 (harder target, decoys, 3 runs each): 11/11 both ways, −77%, +12%. **Open:** a run on Itay's own setup |
+| 9. Proof run | Done in the cloud, two rounds (`docs/proof/`). Round 1: 6/6 bugs both ways, -83% tokens read, +16% wall-clock. Round 2 (harder target, decoys, 3 runs each): 11/11 both ways, -77%, +12%. **Open:** a run on Itay's own setup |
 | 10. README and release | README and license done. Public name decided: Lean-Swarm (2026-09-27). **Open:** `npx` test from another machine, making the repo public |
 
 Changes from the plan as written:
@@ -30,12 +30,12 @@ Changes from the plan as written:
 - **The proof is a planted-bug review** (`proof/`), chosen so output can be scored, not just read.
 - **Round 2 added a harder target with decoys,** audited first by adversarial agents, because round 1 hit the quality ceiling.
 - **X-ray counts files read through shell commands,** because the proof agents read everything with Bash.
-- **Follow-up:** lean agents think more and run about 10–15% slower. Test a role body that mirrors the default workflow agent's wording.
+- **Follow-up:** lean agents think more and run about 10-15% slower. Test a role body that mirrors the default workflow agent's wording.
 
 ## File map
 
 ```
-package.json                     bin: lean-swarm → bin/lean-swarm.js
+package.json                     bin: lean-swarm -> bin/lean-swarm.js
 bin/lean-swarm.js                argument parsing, subcommand dispatch
 src/logs.js                      the only module that knows the log format
 src/measure.js                   pure functions: log data in, numbers out
@@ -149,7 +149,7 @@ docs/proof/                      the before/after write-up
 - [ ] `src/prices.js`: relative weights per model, taken from Anthropic's published price list on the day it's written, with the date and link in a comment. Weights, not dollars.
 - [ ] Implement as pure functions.
 - [ ] Write `docs/method.md`: one short paragraph per number, saying exactly how it's computed.
-- [ ] Tests pass, coverage ≥ 80% on `src/`. Commit.
+- [ ] Tests pass, coverage >= 80% on `src/`. Commit.
 
 ## Task 6: Report and CLI [anywhere]
 
@@ -193,7 +193,7 @@ docs/proof/                      the before/after write-up
   Keep each body to one or two neutral sentences. No instructions that change how the agent works (spec §7.2).
 - [ ] `.claude-plugin/plugin.json` with name, version, description and author. `.claude-plugin/marketplace.json` listing the one plugin, so `/plugin marketplace add itayco2/<repo>` works.
 - [ ] **[Itay's machine] Integration check:** run a small workflow that uses each role once, with a `schema`. Then `xray` on that run. Pass:
-  - each role's first turn ≤ 30k tokens;
+  - each role's first turn <= 30k tokens;
   - loaded tools match the role's list;
   - no `skill_listing` attachment;
   - structured output returned.
@@ -201,7 +201,7 @@ docs/proof/                      the before/after write-up
 
 ## Task 9: The proof run [Itay's machine]
 
-- [ ] **Pick the workflow** (Itay): one he runs often, 6–12 agents, coding or review if possible. Freeze its inputs.
+- [ ] **Pick the workflow** (Itay): one he runs often, 6-12 agents, coding or review if possible. Freeze its inputs.
 - [ ] Make a lean copy that differs only in agent types: each `agent()` call gets the role that fits.
 - [ ] Estimate the usage of 4 runs from the workflow's past runs in X-ray. Write the budget down before running.
 - [ ] Same day, same model and effort: plain, lean, plain, lean (alternating, so time of day affects both equally).

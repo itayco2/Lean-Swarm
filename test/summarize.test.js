@@ -22,10 +22,10 @@ test('bootstrapDiff: exact difference, seeded interval, and nothing to compare',
   assert.equal(bootstrapDiff([], [1]), null);
 });
 
-test('pp never prints floating-point noise as −0.0', () => {
+test('pp never prints floating-point noise as -0.0', () => {
   assert.equal(pp(-1e-17), '+0.0');
   assert.equal(pp(0), '+0.0');
-  assert.equal(pp(-0.019), '−1.9');
+  assert.equal(pp(-0.019), '-1.9');
   assert.equal(pp(0.25), '+25.0');
 });
 
@@ -50,8 +50,8 @@ test('aggregate groups by variant, counts bugs and compares with the baseline', 
   assert.equal(plain.recallVsBase, null);
   assert.equal(lean.recallVsBase.diff, -0.25);
   const md = markdownSummary(agg, KEY);
-  assert.match(md, /\| lean \| 2 \| 1\.5\/2 \(1–2\) \| −25\.0 \(/);
-  assert.match(md, /\| 4\.50M \(−31%\) \|/);
+  assert.match(md, /\| lean \| 2 \| 1\.5\/2 \(1-2\) \| -25\.0 \(/);
+  assert.match(md, /\| 4\.50M \(-31%\) \|/);
   assert.match(md, /\| b \| 2\/2 \| 1\/2 \|/);
 });
 
@@ -80,9 +80,9 @@ test('flags runs without a report, that touched the key, or that were left out',
   assert.match(md, /plain: 2 runs left out \(session error\)/);
   assert.match(md, /omit: 1 runs left out \(no transcript dir\)/);
   assert.equal(agg.variants.find(v => v.name === 'omit').runs, 0);
-  assert.match(md, /\| omit \| 0 \| all runs left out \|( – \|){10}\n/, 'no zero recall or −100% for an empty variant');
-  assert.doesNotMatch(md, /−100%/);
-  assert.match(md, /\| a \| 1\/2 \| – \|/);
+  assert.match(md, /\| omit \| 0 \| all runs left out \|( - \|){10}\n/, 'no zero recall or -100% for an empty variant');
+  assert.doesNotMatch(md, /-100%/);
+  assert.match(md, /\| a \| 1\/2 \| - \|/);
 });
 
 test('unusable explains why a run cannot be scored', () => {

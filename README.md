@@ -23,8 +23,8 @@ From a terminal, the same commands work with `claude plugin` in place of `/plugi
 |---|---:|---:|
 | Agents | 10 | 15, all lean |
 | First turn per agent (median) | 52.6k | 6.5k |
-| Tokens read by the agents | 11.5M | 4.2M (−64%) |
-| Session cost (API prices) | $10.58 | $6.44 (−39%) |
+| Tokens read by the agents | 11.5M | 4.2M (-64%) |
+| Session cost (API prices) | $10.58 | $6.44 (-39%) |
 | Planted bugs found | 13 of 13 | 13 of 13 |
 
 One run per side, so treat the numbers as an example ([write-up](docs/proof/2026-09-27-ultracode.md)); the [Results](#results) below come from repeated runs.
@@ -80,11 +80,11 @@ npx github:itayco2/Lean-Swarm xray
 
 When Claude Code runs several agents at once (workflows or parallel subagents), almost none of the tokens are the agents' own work. Measured with X-ray across 254 runs and 2,459 agents on one heavy setup (2026-09-26):
 
-- **10.25 billion tokens read, 72 million written (0.7%).** Agents mostly re-read context.
-- **41% of all tokens read is each agent's fixed start:** tool definitions, instruction files and listings, loaded before the task and re-read on every turn.
-- **A default workflow agent's first turn was 52–69k tokens. The task in it was about 1k.**
-- **Agents never called most of what they loaded:** Artifact 0% of agents, Skill 0.2%, browser tools 4%.
-- **70% of agents ran 10 or more turns, and they read 97% of all tokens.**
+- 10.25 billion tokens read, 72 million written (0.7%). Agents mostly re-read context.
+- 41% of all tokens read is each agent's fixed start: tool definitions, instruction files and listings, loaded before the task and re-read on every turn.
+- A default workflow agent's first turn was 52-69k tokens. The task in it was about 1k.
+- Agents never called most of what they loaded: Artifact 0% of agents, Skill 0.2%, browser tools 4%.
+- 70% of agents ran 10 or more turns, and they read 97% of all tokens.
 
 This repo has three parts:
 
@@ -94,22 +94,22 @@ This repo has three parts:
 
 ## Results
 
-Same 7-agent review workflow (3 reviewers → 3 checkers → 1 judge), same prompts, default agents vs lean roles, Opus 5.5:
+Same 7-agent review workflow (3 reviewers -> 3 checkers -> 1 judge), same prompts, default agents vs lean roles, Opus 5.5:
 
-| | Short agents (2–3 turns each) | Long agents (reviewers ran 8–30 turns, median about 17; 15k-line codebase) |
+| | Short agents (2-3 turns each) | Long agents (reviewers ran 8-30 turns, median about 17; 15k-line codebase) |
 |---|---|---|
-| Runs | 2–3 per side, 3 rounds | 12 default vs 5 with the current roles |
+| Runs | 2-3 per side, 3 rounds | 12 default vs 5 with the current roles |
 | Bugs found | all, both sides, every run | **all 12 unambiguous bugs, both sides, every run** |
 | False alarms on decoys | 0 | 0 |
-| Tokens read per run | **−59% to −83%** | **−52%** |
-| Tokens read per turn | – | **−47%** |
-| Cost (API prices) | −36% to −62% | **−38%** |
-| Wall-clock | +12% to +16% (slower) | no clear change (−14% pooled, within run-to-run noise) |
+| Tokens read per run | **-59% to -83%** | **-52%** |
+| Tokens read per turn | - | **-47%** |
+| Cost (API prices) | -36% to -62% | **-38%** |
+| Wall-clock | +12% to +16% (slower) | no clear change (-14% pooled, within run-to-run noise) |
 
 - **Long agents are what matter:** they read 97% of the tokens in real use. They save less than short ones because more of what they re-read is their own tool output, not the fixed start.
 - **Quality:** a 13th planted bug had an ambiguous spec (its JSDoc doesn't state the rule it breaks). Default agents reported it twice, both in the first 3 runs; nobody reported it in the 40 runs after. No supported difference. Details and limits: [quality series](docs/proof/2026-09-27-quality-series.md).
 - **Coding:** lean coders finishing a small library passed all 112 hidden checks in every run, like default agents, with 53% fewer tokens and 35% lower cost (2 runs each).
-- **X-ray predicted the saving per turn from the default runs alone,** and the measured saving fell inside its range in every round (long agents: 23.6k–50.5k predicted, 49k measured). The long-agent total came out a little above its predicted 22–47%, because the lean runs also took fewer turns.
+- X-ray predicted the saving per turn from the default runs alone, and the measured saving fell inside its range in every round (long agents: 23.6k-50.5k predicted, 49k measured). The long-agent total came out a little above its predicted 22-47%, because the lean runs also took fewer turns.
 
 ## X-ray
 
@@ -139,15 +139,15 @@ The report covers tokens by kind, the fixed start and what fills it, which tools
 | `reader` | Read, Grep, Glob | | mapping and understanding |
 | `researcher` | WebSearch, WebFetch, Read, Grep, Glob, Bash | | web and paper research |
 | `coder` | Read, Grep, Glob, Edit, Write, Bash | | building and fixing |
-| `reviewer` | Read, Grep, Glob, Bash | ✓ | review and audit |
-| `judge` | Read | ✓ | verdicts and synthesis |
+| `reviewer` | Read, Grep, Glob, Bash | yes | review and audit |
+| `judge` | Read | yes | verdicts and synthesis |
 
 A tools allowlist also drops the skill listing and the deferred-tool listing, so the start shrinks much more than the tools alone. `reviewer` and `judge` also set `omitClaudeMd`, which drops your CLAUDE.md files and `~/.claude/rules` files from their start; they passed the quality test with it. Measured first turns:
 
 | Setup | Default agent | Allowlist | Allowlist + `omitClaudeMd` |
 |---|---:|---:|---:|
 | Heavy local setup, Claude Code 2.1.281 | 52.3k | 18.9k | **5.6k** |
-| Claude Code on the web, 2.1.282, 225 deferred tools | 45.1k | 8.7k | – |
+| Claude Code on the web, 2.1.282, 225 deferred tools | 45.1k | 8.7k | - |
 
 **Install:**
 
@@ -171,10 +171,10 @@ Then start a new session: agent definitions load only when a session starts.
 
 | Round | Where | Agents | Runs | Write-up |
 |---|---|---|---:|---|
-| 1 | Claude Code on the web | short (2–3 turns), 6 easy bugs | 2+2 | [round 1](docs/proof/2026-09-25-review.md) |
+| 1 | Claude Code on the web | short (2-3 turns), 6 easy bugs | 2+2 | [round 1](docs/proof/2026-09-25-review.md) |
 | 2 | Claude Code on the web | short, 11 subtle bugs + 15 decoys | 3+3 | [round 2](docs/proof/2026-09-25-review-round2.md) |
 | local | Windows, heavy setup | short, round-2 target | 3+3 | [local](docs/proof/2026-09-26-local-review.md) |
-| 4 | Windows, heavy setup | long (reviewers 15–27 turns), date-fns with 13 planted bugs + 6 decoys | 3+3 | [long agents](docs/proof/2026-09-26-long-agents.md) |
+| 4 | Windows, heavy setup | long (reviewers 15-27 turns), date-fns with 13 planted bugs + 6 decoys | 3+3 | [long agents](docs/proof/2026-09-26-long-agents.md) |
 | 5 | Windows, heavy setup | long, five variants in rotated blocks, plus a firmer nudge on its own | 37 | [quality series](docs/proof/2026-09-27-quality-series.md) |
 | ultracode | Windows, heavy setup | Claude writes the workflow: plain ultracode with default agents vs with the plugin installed, on round 4's target | 1+1 | [ultracode](docs/proof/2026-09-27-ultracode.md) |
 
@@ -184,17 +184,17 @@ The kit to rerun any of it on your own setup, and to test your own changes as ex
 
 Measured on the long-agent runs, the real workflow history and the quality series ([decision 0003](docs/decisions/0003-next-levers.md)):
 
-- **Trimming large tool outputs (keep the head and tail):** in review work the big outputs are the code being reviewed. 24–35% of outputs over 8k characters held a line the agent later relied on, and 38% of round-4 findings were never visible in the part a 4k+4k trim keeps. The safe part (builds, tests, git, listings) is worth 0.2–1.5% of cost.
+- **Trimming large tool outputs (keep the head and tail):** in review work the big outputs are the code being reviewed. 24-35% of outputs over 8k characters held a line the agent later relied on, and 38% of round-4 findings were never visible in the part a 4k+4k trim keeps. The safe part (builds, tests, git, listings) is worth 0.2-1.5% of cost.
 - **Clearing old tool results mid-run:** 0 of 108 simulated policies saved money. On Opus 5.5 clearing forces a cache rewrite at $5 per million tokens to save reads at $0.20.
 - **A 1-hour cache for subagents:** +37% cost per run; no agent paused longer than 93 seconds.
 - **Nudging agents to batch tool calls:** a hook after each one-call turn raised batched turns from 2% to 20% and cut turns by 13%, but batched turns read more, and cost didn't fall (5 runs each).
 
 ## Limits
 
-- **Savings depend on your setup.** Many skills, connectors, MCP servers and large CLAUDE.md or rules files mean bigger savings; a lean setup saves less. Run X-ray to see yours.
-- **Quality was tested on code review at length and on coding briefly,** each on one codebase, with one model. Research agents weren't tested. The kit is there to test yours.
-- **Anthropic is changing this area.** `omitClaudeMd` shipped in 2.1.271, and requests to trim subagent context are open. X-ray stays useful either way.
-- **Single-session chat gains little.** Other tools cover that.
+- Savings depend on your setup. Many skills, connectors, MCP servers and large CLAUDE.md or rules files mean bigger savings; a lean setup saves less. Run X-ray to see yours.
+- Quality was tested on code review at length and on coding briefly, each on one codebase, with one model. Research agents weren't tested. The kit is there to test yours.
+- Anthropic is changing this area. `omitClaudeMd` shipped in 2.1.271, and requests to trim subagent context are open. X-ray stays useful either way.
+- Single-session chat gains little. Other tools cover that.
 
 ## More
 

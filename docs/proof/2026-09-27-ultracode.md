@@ -17,9 +17,9 @@ Prompt in every run: `ultracode: review this library for bugs, using the JSDoc o
 | Agents | 10 workflow-subagent | 15 lean-swarm:reviewer | 15 lean-swarm:reviewer, 1 lean-swarm:judge |
 | First turn per agent (median) | 52.6k | 6.5k | 6.1k (reviewer), 11.7k (judge) |
 | Turns | 127 | 116 | 105 |
-| Tokens read by the agents | 11.54M | 4.16M (−64%) | 3.08M (−73%) |
+| Tokens read by the agents | 11.54M | 4.16M (-64%) | 3.08M (-73%) |
 | Agents' cost (API prices) | $9.52 | $5.39 | $4.76 |
-| Session cost, `total_cost_usd` | $10.58 | $6.44 (−39%) | $5.66 (−46%) |
+| Session cost, `total_cost_usd` | $10.58 | $6.44 (-39%) | $5.66 (-46%) |
 | Workflow wall-clock | 6.5 min | 3.1 min | 3.1 min |
 | Planted bugs found | 13 of 13 | 13 of 13 | 13 of 13 |
 | Decoys reported | 0 | 0 | 0 |

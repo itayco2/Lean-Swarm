@@ -59,10 +59,10 @@ export function timingTable(timings) {
   const rows = [];
   for (const t of timings) {
     for (const [stage, s] of Object.entries(t.stages)) {
-      rows.push(`| ${t.id} | ${t.variant} | ${sec(t.wallMs)} | ${stage} | ${s.agents} | ${sec(s.medianMs)} | ${sec(s.maxMs)} | ${s.turns} | ${s.turns ? sec(s.modelMs / s.turns) : '–'} | ${sec(s.toolMs)} | ${s.output} | ${s.thinking} | ${Math.round(s.medianFirst / 100) / 10}k | ${Math.round(100 * s.medianFirstCached)}% |`);
+      rows.push(`| ${t.id} | ${t.variant} | ${sec(t.wallMs)} | ${stage} | ${s.agents} | ${sec(s.medianMs)} | ${sec(s.maxMs)} | ${s.turns} | ${s.turns ? sec(s.modelMs / s.turns) : '-'} | ${sec(s.toolMs)} | ${s.output} | ${s.thinking} | ${Math.round(s.medianFirst / 100) / 10}k | ${Math.round(100 * s.medianFirstCached)}% |`);
     }
   }
-  const tools = timings.map(t => `- ${t.id} (${t.variant}): ${Object.entries(t.toolCounts).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ×${v}`).join(', ')}`);
+  const tools = timings.map(t => `- ${t.id} (${t.variant}): ${Object.entries(t.toolCounts).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} x${v}`).join(', ')}`);
   return [
     '| Run | Variant | Wall (s) | Stage | Agents | Median agent (s) | Slowest agent (s) | Turns | Model s/turn | Tool time (s) | Output tokens | of which thinking | Median first turn | First turn cached |',
     '|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|',

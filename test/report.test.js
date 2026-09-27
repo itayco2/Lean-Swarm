@@ -16,9 +16,9 @@ test('number formats', () => {
   assert.equal(fmtTokens(68000), '68.0k');
   assert.equal(fmtTokens(2.5e6), '2.5M');
   assert.equal(fmtTokens(12), '12');
-  assert.equal(fmtTokens(null), '–');
+  assert.equal(fmtTokens(null), '-');
   assert.equal(fmtPct(0.4312), '43%');
-  assert.equal(fmtPct(null), '–');
+  assert.equal(fmtPct(null), '-');
 });
 
 test('markdown has every section, in order', () => {
@@ -46,8 +46,8 @@ test('markdown for logs that include tool definitions', () => {
   assert.match(md, /Loaded but never called: Artifact \(1 agents\)/);
   assert.match(md, /\| Tool definitions \| 2\.3k \|/);
   // The agent fits the reviewer role, which omits CLAUDE.md (low end) and, reportedly, MEMORY.md (high end).
-  assert.match(md, /Lean roles would save:\*\* about 55%–59% of tokens read \(10\.8k–11\.6k\)/);
-  assert.match(md, /\| code-reviewer \| 1 \| reviewer \(100%\) \| 5\.0k \| 3\.6k–3\.9k \| 10\.8k–11\.6k \|/);
+  assert.match(md, /Lean roles would save:\*\* about 55%-59% of tokens read \(10\.8k-11\.6k\)/);
+  assert.match(md, /\| code-reviewer \| 1 \| reviewer \(100%\) \| 5\.0k \| 3\.6k-3\.9k \| 10\.8k-11\.6k \|/);
   assert.match(md, /^1970-01-01 to 1970-01-01$/m);
   assert.match(md, /Lines skipped: 2 unparseable line/);
   assert.match(md, /\| code-reviewer \| 1 \| reviewer \(100%\)/);
@@ -70,5 +70,5 @@ test('compareMarkdown shows both groups and the change', () => {
   const md = compareMarkdown(compare(a, b), a, b);
   assert.match(md, /^# X-ray compare: 1 runs \(A\) vs 2 runs \(B\)/);
   assert.match(md, /\| Tokens read per run \| 19\.7k \|/);
-  assert.match(md, /A agent types: code-reviewer ×1, workflow-subagent ×1/);
+  assert.match(md, /A agent types: code-reviewer x1, workflow-subagent x1/);
 });

@@ -6,7 +6,7 @@ X-ray reads Claude Code's local transcripts. It never changes them and never sen
 
 - **Workflow runs:** `~/.claude/projects/<project>/<session>/subagents/workflows/<run>/agent-<id>.jsonl`, plus `agent-<id>.meta.json` (agent type, label, workflow phase).
 - **Plain subagents** (the Agent tool): `~/.claude/projects/<project>/<session>/subagents/agent-<id>.jsonl` and `.meta.json`. X-ray groups one session's plain subagents as one run.
-- **One turn** is one model reply. Claude Code writes a reply as several lines with the same message id. X-ray counts the reply once: input and cache fields come from its first line with usage, and output tokens from the largest value seen on its lines. The first line's output count is a partial snapshot (often single digits), so a tool that reads only the first line undercounts output many times over; the 2026-09-25 prototype scripts did (about 14×). Input and cache fields were identical on every line of all 382 replies checked in proof round 4. When a reply's final line is missing altogether (anthropics/claude-code#84223, about 7% of requests in one heavy history), its output is undercounted; that was worth about 2% of billed cost there.
+- **One turn** is one model reply. Claude Code writes a reply as several lines with the same message id. X-ray counts the reply once: input and cache fields come from its first line with usage, and output tokens from the largest value seen on its lines. The first line's output count is a partial snapshot (often single digits), so a tool that reads only the first line undercounts output many times over; the 2026-09-25 prototype scripts did (about 14x). Input and cache fields were identical on every line of all 382 replies checked in proof round 4. When a reply's final line is missing altogether (anthropics/claude-code#84223, about 7% of requests in one heavy history), its output is undercounted; that was worth about 2% of billed cost there.
 
 ## Tokens
 
@@ -17,7 +17,7 @@ X-ray reads Claude Code's local transcripts. It never changes them and never sen
 ## Fixed start
 
 - **First-turn context** of an agent = tokens read on its first turn. It's everything loaded before the agent does any work: system prompt, tool definitions, instruction files, listings and the task.
-- **Fixed start share** = Σ(first-turn context × turns) ÷ Σ tokens read. Every later turn re-reads that start, so this is the share of reading that is the same start over and over. Reported token-weighted over all runs, and as the median per run. Same definition as the prototype `wfall.js`.
+- **Fixed start share** = Σ(first-turn context x turns) ÷ Σ tokens read. Every later turn re-reads that start, so this is the share of reading that is the same start over and over. Reported token-weighted over all runs, and as the median per run. Same definition as the prototype `wfall.js`.
 
 ## What fills the first turn
 
@@ -27,7 +27,7 @@ X-ray reads Claude Code's local transcripts. It never changes them and never sen
 
 ## Cost
 
-- **Price-weighted cost** uses Anthropic's list prices per model (`src/prices.js`, with its source date): input, output, cache reads (0.1× input, or the model's own rate: 0.05× on Opus 5.5, 0.025× on Fable 5.1), 5-minute cache writes (1.25× input) and 1-hour cache writes (2× input). Writes not split by TTL count as 5-minute.
+- **Price-weighted cost** uses Anthropic's list prices per model (`src/prices.js`, with its source date): input, output, cache reads (0.1x input, or the model's own rate: 0.05x on Opus 5.5, 0.025x on Fable 5.1), 5-minute cache writes (1.25x input) and 1-hour cache writes (2x input). Writes not split by TTL count as 5-minute.
 - **Re-read share of cost** = cache-read cost ÷ total cost, median per run.
 - **API-price equivalent** is the same cost in dollars. On a subscription it is a comparison unit, not a bill.
 - The prototype used fixed weights (cache read 0.1, every write 1.25, output 5). X-ray's per-model prices give a lower re-read share when runs use Opus 5.5 or 1-hour writes. On the 4-agent test run: 3% vs the prototype's 6%.
@@ -43,7 +43,7 @@ X-ray reads Claude Code's local transcripts. It never changes them and never sen
 Same method as `timeuse.js`. X-ray walks each agent's timestamped lines in order. The gap before a line goes to what that line is: a model reply is model time, a tool result is time for that tool, anything else is "other". Gaps over 30 minutes (machine asleep or paused) and negative gaps are dropped.
 
 - **Seconds per turn** = counted time ÷ turns.
-- **Wall-clock per run** = last timestamp − first timestamp across the run's agents.
+- **Wall-clock per run** = last timestamp - first timestamp across the run's agents.
 
 ## Turns
 
@@ -52,7 +52,7 @@ Same method as `timeuse.js`. X-ray walks each agent's timestamped lines in order
 
 ## Duplicate reads
 
-Same keys as `wfall.js`: a file path (lowercased, `\` → `/`), a URL (without query, fragment or trailing slash), or a Grep or Glob pattern with its path. Each agent contributes each key once. For each key read by n agents, n − 1 reads are duplicates. The run's duplicate share = duplicates ÷ all reads.
+Same keys as `wfall.js`: a file path (lowercased, `\` -> `/`), a URL (without query, fragment or trailing slash), or a Grep or Glob pattern with its path. Each agent contributes each key once. For each key read by n agents, n - 1 reads are duplicates. The run's duplicate share = duplicates ÷ all reads.
 
 **Reads through the shell count too.** Agents often print files with Bash instead of the Read tool (`cat -n`, `sed -n '10,40p'`, `head`). In the first proof run, reviewers read every file that way, and the tool-only count saw no reads at all. X-ray also takes file keys from plain reader commands in Bash or PowerShell: `cat`, `head`, `tail`, `nl`, `sed` (not `sed -i`), `bat`, `less`, `more`, `type`, `Get-Content`. Relative paths resolve against the line's working directory, following `cd`. Globs, variables and `grep` don't count. The report also gives the tool-only share, the prototype's definition, for comparison.
 
@@ -64,11 +64,11 @@ The Opus share of a run = turns on an Opus model ÷ all turns. The prototype cou
 
 - **Fitting a role:** each agent gets the role with the fewest tools that covers every tool it called. Because reviewer and judge also drop CLAUDE.md, an agent fitted to reader could start smaller as a reviewer; X-ray still reports reader, the closer fit. The roles are in `src/roles.js`. StructuredOutput, SubagentHandback and ToolSearch don't count, because a role gets them anyway or doesn't need them. PowerShell counts as Bash.
 - **Saving per turn:** the skill listing and deferred-tool listing, plus the definitions of tools the role leaves out. Agents that already start without those listings already have a tools allowlist, so they save only what the next point adds.
-  - Roles marked `omitClaudeMd` in `src/roles.js` (reviewer and judge) also drop the instruction attachment: CLAUDE.md files and `~/.claude/rules` files. That was measured on Claude Code 2.1.281 (a Bash-only role: 15.7k → 3.2k first turn). MEMORY.md is reported to go with them but wasn't measured, so it counts toward the high end only; that's why a range can appear even where the log holds tool definitions.
+  - Roles marked `omitClaudeMd` in `src/roles.js` (reviewer and judge) also drop the instruction attachment: CLAUDE.md files and `~/.claude/rules` files. That was measured on Claude Code 2.1.281 (a Bash-only role: 15.7k -> 3.2k first turn). MEMORY.md is reported to go with them but wasn't measured, so it counts toward the high end only; that's why a range can appear even where the log holds tool definitions.
   - Where the log holds tool definitions, this is exact, up to the character split.
   - Where it doesn't, it's a range. The low end is the listings alone. The high end is the listings plus everything not in the log, minus a floor: the median unlogged start of agents in your logs that already have an allowlist. Those agents show how much a lean agent still carries outside the log (its own few tool definitions and the like).
-  - On the test run, the default agent's range is 7.5k–39.8k per turn. A 2-tool agent in the same session measured 36.4k less than the default (45.1k vs 8.7k), which falls inside the range.
-- **Tokens read saved** = saving per turn × the agent's turns, because the start is re-read on every turn.
+  - On the test run, the default agent's range is 7.5k-39.8k per turn. A 2-tool agent in the same session measured 36.4k less than the default (45.1k vs 8.7k), which falls inside the range.
+- **Tokens read saved** = saving per turn x the agent's turns, because the start is re-read on every turn.
 
 ## Checked against the prototypes
 

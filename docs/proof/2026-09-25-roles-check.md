@@ -11,7 +11,7 @@ Roles check: X-ray of the proof/roles-check.workflow.js run (rolePrefix "", proj
 - **Re-reading cached context:** 0% of price-weighted cost (median run).
 - **Same file or URL read by 2+ agents in one run:** median 0% of reads; 0 of 1 runs at 30% or more.
 - **API-price equivalent:** about $0.39 at list prices (2026-06-24). On a subscription this is a comparison unit, not a bill.
-- **Lean roles would save:** about 14%–58% of tokens read (9.8k–41.7k). See "What you could cut".
+- **Lean roles would save:** about 14%-58% of tokens read (9.8k-41.7k). See "What you could cut".
 
 ## Tokens by kind
 
@@ -80,7 +80,7 @@ Each lean role loads only the tools it lists, which also drops the skill listing
 | Agent type | Agents | Fits role | Median start | Saved per turn | Tokens read saved |
 |---|---:|---:|---:|---:|---:|
 | judge | 1 | judge (100%) | 2.9k | 0 | 0 |
-| workflow-subagent | 1 | judge (100%) | 47.1k | 9.8k–41.7k | 9.8k–41.7k |
+| workflow-subagent | 1 | judge (100%) | 47.1k | 9.8k-41.7k | 9.8k-41.7k |
 | reviewer | 1 | judge (100%) | 5.4k | 0 | 0 |
 | reader | 1 | judge (100%) | 4.4k | 0 | 0 |
 | coder | 1 | judge (100%) | 6.0k | 0 | 0 |

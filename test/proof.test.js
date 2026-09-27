@@ -55,7 +55,7 @@ test('readProofRun finds the report, the variant and any peek at the key', () =>
   assert.equal(r.variant, 'lean');
   assert.equal(r.touchedKey, true);
   assert.equal(r.findings.length, 1);
-  assert.match(scoreTable([r]), /\| lean \| 1\/6 \| discount-subtracted \|.*\| 0 \| – \| yes \|/);
+  assert.match(scoreTable([r]), /\| lean \| 1\/6 \| discount-subtracted \|.*\| 0 \| - \| yes \|/);
   assert.match(scoreTable([{ dir, variant: 'plain', findings: null, touchedKey: false }]), /no report found/);
 });
 
@@ -110,7 +110,7 @@ test('scoreFindings counts findings inside decoys as false alarms', () => {
   assert.equal(s.other.length, 2);
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'proof-'));
   const table = scoreTable([{ dir, variant: 'plain', findings: [{ file: 'src/a.js', line: 7 }], touchedKey: false }], key);
-  assert.match(table, /\| plain \| 0\/1 \| – \| b \| 1 \| d1 \| no \|/);
+  assert.match(table, /\| plain \| 0\/1 \| - \| b \| 1 \| d1 \| no \|/);
 });
 
 test('score.js CLI takes --key', () => {

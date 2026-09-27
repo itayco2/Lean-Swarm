@@ -3,7 +3,7 @@
 This kit runs one real multi-agent workflow twice each way and compares tokens, time and output.
 
 - **The task:** review `target/`, a small library with six planted bugs. Each bug is a place where the code breaks its own JSDoc. `grading/key.json` lists them.
-- **The workflow:** `review.workflow.js`. Three reviewers (one lens each) → three checkers → one judge that merges the lists: 7 agents. The plain and lean variants use identical prompts. The only difference is the agent type: default agents, or `lean-swarm:reviewer` and `lean-swarm:judge`. `test/proof.test.js` checks this.
+- **The workflow:** `review.workflow.js`. Three reviewers (one lens each) -> three checkers -> one judge that merges the lists: 7 agents. The plain and lean variants use identical prompts. The only difference is the agent type: default agents, or `lean-swarm:reviewer` and `lean-swarm:judge`. `test/proof.test.js` checks this.
 - **Scoring:** `score.js` counts the planted bugs in the judge's final list (same file, line within 3) and lists other findings. It also flags any run whose agents touched `grading/`.
 
 ## Why it needs a fresh session
@@ -72,7 +72,7 @@ The score now also counts **decoy hits**: findings that flag correct code.
 
 ## Round 3: long agents
 
-Rounds 1 and 2 used short agents (2–3 turns each). There the fixed start is about 90% of what an agent reads, so cutting it looks bigger than it is on real work, where agents run 15 or more turns and the fixed start is about 40% of their reading.
+Rounds 1 and 2 used short agents (2-3 turns each). There the fixed start is about 90% of what an agent reads, so cutting it looks bigger than it is on real work, where agents run 15 or more turns and the fixed start is about 40% of their reading.
 
 Round 3 gives the agents real coding work, so they run long:
 

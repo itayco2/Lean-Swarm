@@ -7,7 +7,7 @@
 
 ## 1. Problem
 
-When Claude Code runs several agents at once (the Workflow tool, or parallel subagents), the runs are slow and expensive: 15–100+ minutes and hundreds of millions of tokens. Almost none of that is the agents' own work. They mostly re-read the same context turn after turn.
+When Claude Code runs several agents at once (the Workflow tool, or parallel subagents), the runs are slow and expensive: 15-100+ minutes and hundreds of millions of tokens. Almost none of that is the agents' own work. They mostly re-read the same context turn after turn.
 
 The biggest single cause is each agent's **fixed start**: tool definitions, instruction files and listings, loaded before the task and re-read on every turn. It is 43% of all tokens read. In a default workflow agent's 68k-token first turn, the task itself is about 2k.
 
@@ -24,13 +24,13 @@ Source: 203 finished workflow runs, 2,121 agents, 52,153 model turns, read from 
 | Fixed context at the start of each turn, share of all tokens read | 43% (median run 55%) |
 | Median first-turn context, default workflow agent (2,025 agents) | 68k tokens |
 | Same, `code-reviewer` type with 4 tools | 29k tokens |
-| Same, reviewer types without instruction files | 10–13k tokens |
+| Same, reviewer types without instruction files | 10-13k tokens |
 | First-turn composition (374 agents with a prompt snapshot) | tools ~36k (41 tools; Artifact alone ~16k), instruction files ~12k, skill listing ~11k, deferred-tool listing ~6k, **task ~2k** |
 | Share of agents that ever called a tool | Bash 82%, StructuredOutput 79%, Read 62%, Grep 26%, Write 19%, ToolSearch 18%, Edit 14%, WebFetch 13%, WebSearch 13%, PowerShell 9%, any browser tool 3%, Skill 0.2%, Artifact 0% |
 | Where agent time went | model 75%, Bash 19%, web tools ~2.4% |
 | Turns with exactly one tool call | 73%; about 16 s per turn |
-| Same file or URL read by 2+ agents in one run | median 13%; 56 of 203 runs ≥30% |
-| Runs where ≥95% of turns ran on Opus | 171 of 203 |
+| Same file or URL read by 2+ agents in one run | median 13%; 56 of 203 runs >=30% |
+| Runs where >=95% of turns ran on Opus | 171 of 203 |
 
 In one research run (8 agents), the verifier agents re-opened 164 of their 250 URLs (66%) that the research agents had already read.
 
@@ -55,7 +55,7 @@ We surveyed about 30 repos (details in `research/landscape.md`, to be written).
 - Verify that your tools are actually called. token-savior withdrew its benchmark after finding they were not.
 - Count billed tokens, not bytes ÷ 4 (RTK's method).
 - Never hand an agent a reference to content it never saw (the dedup risk in sqz and omni).
-- Compressing history blindly, without regard to the task, loses 6–17 points (ACON, SWE-Pruner baselines).
+- Compressing history blindly, without regard to the task, loses 6-17 points (ACON, SWE-Pruner baselines).
 
 **Demand signals:** token-saving tools are among the most-starred Claude Code repos (RTK 82k, headroom 74k, Context Mode 24k), and open Claude Code issues ask for this directly: anthropics/claude-code#74318 (the context every new subagent starts with) and anthropics/claude-code#93477 (leave out the skill listing).
 
@@ -64,7 +64,7 @@ We surveyed about 30 repos (details in `research/landscape.md`, to be written).
 | Part | What it is | Why it's in v1 | Effort |
 |---|---|---|---|
 | **X-ray** | One command that shows where a user's multi-agent runs spend tokens and time, by cause | Nobody else explains causes. The prototype scripts already do about 80% of it | about a day |
-| **Lean roles** | 5 agent definitions that load only the tools each role uses | Targets the biggest cause (fixed start, 43% of tokens read). Already measured: 68k → 29k first turn | a few hours; mostly short config files |
+| **Lean roles** | 5 agent definitions that load only the tools each role uses | Targets the biggest cause (fixed start, 43% of tokens read). Already measured: 68k -> 29k first turn | a few hours; mostly short config files |
 | **Proof** | Run one real workflow of Itay's both ways and compare tokens, time and output | Gives the before/after for the README and the post | a few hours, plus the usage cost of the runs |
 
 **Why this cut works:** the waste isn't spread evenly. One cause, the fixed start, is 43% of all tokens read. It is also the one cut that needs no quality gate: removing a tool an agent never calls can't change what it does. Every lossy cut moves to §9.
@@ -86,9 +86,9 @@ We surveyed about 30 repos (details in `research/landscape.md`, to be written).
 **Success criteria**
 - **X-ray is correct:** on Itay's logs it reproduces the §2 numbers (token counts exact, shares within 1 point), and its fixture tests pass.
 - **X-ray works for others:** it runs with one command and no config on a setup it has never seen. It skips and counts log lines it doesn't recognize instead of crashing or guessing.
-- **Lean roles cut the start:** every role's first-turn context is ≤ 30k tokens on Itay's setup (default: 68k), measured by X-ray on the roles' own transcripts.
+- **Lean roles cut the start:** every role's first-turn context is <= 30k tokens on Itay's setup (default: 68k), measured by X-ray on the roles' own transcripts.
 - **Lean roles don't break workflows:** an agent with a `schema` still returns structured output (Q1), and no role needs ToolSearch to reach its own tools (Q2).
-- **Proof:** on one real workflow, **≥ 20% fewer tokens read** with lean roles, and output that holds up in the §7.3 check. Expected: 25–30%, since the fixed start is 43–55% of tokens read and the roles cut it by about 57%. Wall-clock is reported without a target: this cut is mainly about tokens.
+- **Proof:** on one real workflow, **>= 20% fewer tokens read** with lean roles, and output that holds up in the §7.3 check. Expected: 25-30%, since the fixed start is 43-55% of tokens read and the roles cut it by about 57%. Wall-clock is reported without a target: this cut is mainly about tokens.
 
 ## 6. Design principles
 
@@ -139,17 +139,17 @@ One repo with two things in it: a Node.js CLI (X-ray) and a Claude Code plugin (
 | reviewer | Read, Grep, Glob, Bash | review, audit |
 | judge | Read | verdicts, synthesis |
 
-- **What a role leaves out:** Skill, ToolSearch, Artifact, PowerShell, browser tools and connector tools. On CLI 2.1.250 a tools allowlist also drops the skill listing and the deferred-tool listing (confirmed from the `code-reviewer` transcripts: 44 → 4 tools, 68k → 29k first turn).
+- **What a role leaves out:** Skill, ToolSearch, Artifact, PowerShell, browser tools and connector tools. On CLI 2.1.250 a tools allowlist also drops the skill listing and the deferred-tool listing (confirmed from the `code-reviewer` transcripts: 44 -> 4 tools, 68k -> 29k first turn).
 - **Why it's safe:** from §2, agents called Artifact 0% of the time and Skill 0.2%. ToolSearch (18%) only loads deferred tools, and the roles name their tools directly. Two cuts do change behavior slightly: agents that used PowerShell (9%) or a browser tool (3%) will use Bash or WebFetch instead. The proof run checks this.
 - **Tool lists are final only after X-ray:** each list is checked against X-ray's tool use per agent type on Itay's logs before release.
-- **Instruction files are kept in every role.** Omitting them (`omitClaudeMd`, CLI ≥ 2.1.271) is lossy, so it's in §9.
+- **Instruction files are kept in every role.** Omitting them (`omitClaudeMd`, CLI >= 2.1.271) is lossy, so it's in §9.
 - **Role prompt:** short and neutral. It names the role and adds no instructions that change how the agent works. A "make independent calls in the same turn" line would cut turns, but it's a behavior change, so it's in §9.
 - **Model and effort:** inherited.
 - **Opt-in:** a role is used only when a workflow or the user names it (Q3). Nothing changes default agents.
 
 ### 7.3 Proof: one workflow, both ways
 
-- **Pick:** one real workflow Itay runs often, with 6–12 agents and frozen inputs. Prefer coding or review, because tests or planted bugs can score the output. A research workflow needs a blind read.
+- **Pick:** one real workflow Itay runs often, with 6-12 agents and frozen inputs. Prefer coding or review, because tests or planted bugs can score the output. A research workflow needs a blind read.
 - **Runs:** plain twice, lean twice, on the same day with the same model and effort. The gap between the two plain runs is the noise floor. State the usage budget before running.
 - **Compare with `xray --compare`:** tokens read by kind, price-weighted units, wall-clock, turns, first-turn context per agent, and errors from agents trying tools a role left out.
 - **Output check:** coding: tests pass. Review: bugs found. Research: Itay reads both outputs with the labels hidden.
@@ -167,7 +167,7 @@ One repo with two things in it: a Node.js CLI (X-ray) and a Claude Code plugin (
 
 | Part | What it does | Why it waits |
 |---|---|---|
-| Omit instruction files | `omitClaudeMd: true` per role; reviewer types measured at 10–13k first turn | Lossy. Needs CLI ≥ 2.1.271 and the gate |
+| Omit instruction files | `omitClaudeMd: true` per role; reviewer types measured at 10-13k first turn | Lossy. Needs CLI >= 2.1.271 and the gate |
 | Fan-out kit | Workflow templates (research, review, coding) whose sibling agents share one cached prefix and pass compact findings between stages | Changes how runs are structured; needs the gate |
 | Trim hook | PostToolUse hook that trims large outputs (logs, search results, pages) and keeps the raw text behind an `expand` handle | Lossy. Scoping it to our agents is an open question |
 | Run memory and batch tools | MCP server: fetch each source once per run, `expand`, findings board, `check_quote`, `read_many` | The biggest build. Choosing passages is lossy |
@@ -180,11 +180,11 @@ One repo with two things in it: a Node.js CLI (X-ray) and a Claude Code plugin (
 
 | Safe to cut | Carries quality: keep |
 |---|---|
-| Old tool results the agent already used (context editing: −84% tokens, better results) | How widely agents search (token use explains 80% of BrowseComp variance, per Anthropic) |
-| Parts of an observation the task doesn't need, when trimming is task-guided (SWE-Pruner −23–38% on 500 tasks with no loss; FocusAgent −50%) | Verification (dropping ArcticSwarm's review gates cost 6–8 points) |
+| Old tool results the agent already used (context editing: -84% tokens, better results) | How widely agents search (token use explains 80% of BrowseComp variance, per Anthropic) |
+| Parts of an observation the task doesn't need, when trimming is task-guided (SWE-Pruner -23-38% on 500 tasks with no loss; FocusAgent -50%) | Verification (dropping ArcticSwarm's review gates cost 6-8 points) |
 | Exact duplicates (shared cache, identical-prefix reuse) | Agents working independently before sharing (early sharing cost 3.8 points) |
-| Tool definitions not needed right now (tool search: −85% tokens, higher accuracy) | Information needed later (cutting it causes 3× more re-fetching) |
-| Turns made one call at a time (parallel calls: up to 3.7× faster) | A strong model on hard steps; handing off to a stronger model mid-task recovers less than half the quality gap |
+| Tool definitions not needed right now (tool search: -85% tokens, higher accuracy) | Information needed later (cutting it causes 3x more re-fetching) |
+| Turns made one call at a time (parallel calls: up to 3.7x faster) | A strong model on hard steps; handing off to a stronger model mid-task recovers less than half the quality gap |
 
 **Open questions for the later parts:** how an agent learns its run id; whether PostToolUse hook input names the subagent; the exact name of a plugin MCP tool in `tools`; whether `omitClaudeMd` also drops `~/.claude/rules/*.md` and MEMORY.md; whether CLI 2.1.250 ignores unknown frontmatter fields.
 
@@ -216,7 +216,7 @@ Each milestone ends with its numbers in the README and a commit.
 
 ## 13. Open questions (v1)
 
-Q1–Q4 are answered in `docs/decisions/0002-open-questions.md`: Q1, Q2 and Q4 from a live run, and Q3 from the docs. Q5 is still open.
+Q1-Q4 are answered in `docs/decisions/0002-open-questions.md`: Q1, Q2 and Q4 from a live run, and Q3 from the docs. Q5 is still open.
 
 
 - **Q1** Is StructuredOutput still available when a role has a tools allowlist and the workflow passes a schema? The docs say yes; confirm. 79% of agents use it, so this decides whether lean roles work in workflows at all.

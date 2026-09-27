@@ -4,7 +4,7 @@ import { PRICES_AS_OF } from './prices.js';
 import { ROLES } from './roles.js';
 
 export function fmtTokens(n) {
-  if (n === null || n === undefined) return '–';
+  if (n === null || n === undefined) return '-';
   const a = Math.abs(n);
   if (a >= 1e9) return (n / 1e9).toFixed(2) + 'B';
   if (a >= 1e6) return (n / 1e6).toFixed(1) + 'M';
@@ -13,14 +13,14 @@ export function fmtTokens(n) {
 }
 
 export function fmtPct(x, digits = 0) {
-  if (x === null || x === undefined || Number.isNaN(x)) return '–';
+  if (x === null || x === undefined || Number.isNaN(x)) return '-';
   return (100 * x).toFixed(digits) + '%';
 }
 
 const fmtDuration = ms => (ms >= 3.6e6 ? (ms / 3.6e6).toFixed(1) + ' h' : (ms / 6e4).toFixed(1) + ' min');
 const fmtUsd = n => '$' + (n >= 100 ? Math.round(n).toLocaleString('en-US') : n.toFixed(2));
 const fmtDate = t => (t === null || t === undefined ? '?' : new Date(t).toISOString().slice(0, 10));
-const fmtRange = (lo, hi, f) => (f(lo) === f(hi) ? f(lo) : `${f(lo)}–${f(hi)}`);
+const fmtRange = (lo, hi, f) => (f(lo) === f(hi) ? f(lo) : `${f(lo)}-${f(hi)}`);
 const table = (head, rows) => [
   '| ' + head.join(' | ') + ' |',
   '|' + head.map((_, i) => (i === 0 ? '---' : '---:')).join('|') + '|',
@@ -74,7 +74,7 @@ export function markdown(s, opts = {}) {
 
   out.push('## Fixed start by agent type');
   out.push(table(['Agent type', 'Agents', 'Median first turn', 'Median turns', 'Fixed share of tokens read'], s.agentTypes.slice(0, top).map(t => [
-    t.type, String(t.agents), fmtTokens(t.medianFirstTurn), String(t.medianTurns ?? '–'), fmtPct(t.fixedShare),
+    t.type, String(t.agents), fmtTokens(t.medianFirstTurn), String(t.medianTurns ?? '-'), fmtPct(t.fixedShare),
   ])));
 
   const withMakeup = s.agentTypes.filter(t => t.makeup).slice(0, 3);
@@ -101,7 +101,7 @@ export function markdown(s, opts = {}) {
   const timeRows = Object.entries(s.time).sort((a, b) => b[1] - a[1]).slice(0, 10)
     .map(([k, v]) => [k === 'model' ? 'Model' : k.replace(/^tool:/, ''), fmtDuration(v), fmtPct(v / Math.max(1, s.timeTotal), 1)]);
   out.push(table(['Spent on', 'Agent time', 'Share'], timeRows));
-  out.push(`${fmtPct(s.oneCallShare)} of turns made exactly one tool call; ${s.callsPerTurn.toFixed(2)} calls per turn; about ${Math.round(s.secondsPerTurn)} s per turn; median ${s.medianTurnsPerAgent ?? '–'} turns per agent.`);
+  out.push(`${fmtPct(s.oneCallShare)} of turns made exactly one tool call; ${s.callsPerTurn.toFixed(2)} calls per turn; about ${Math.round(s.secondsPerTurn)} s per turn; median ${s.medianTurnsPerAgent ?? '-'} turns per agent.`);
 
   out.push('## Models');
   const modelTurns = Object.values(s.models).reduce((a, b) => a + b, 0);
@@ -117,7 +117,7 @@ export function markdown(s, opts = {}) {
   out.push(table(['Agent type', 'Agents', 'Fits role', 'Median start', 'Saved per turn', 'Tokens read saved'], s.agentTypes.slice(0, top).map(t => [
     t.type,
     String(t.agents),
-    t.topRole ? `${t.topRole.role} (${fmtPct(t.topRole.share)})` : '–',
+    t.topRole ? `${t.topRole.role} (${fmtPct(t.topRole.share)})` : '-',
     fmtTokens(t.medianFirstTurn),
     fmtRange(t.medianSaving.low, t.medianSaving.high, fmtTokens),
     fmtRange(t.savedRead.low, t.savedRead.high, fmtTokens),
@@ -158,16 +158,16 @@ export function compareMarkdown(rows, a, b) {
   const out = [];
   out.push(`# X-ray compare: ${a.runCount} runs (A) vs ${b.runCount} runs (B)`);
   const fmt = (name, v) => {
-    if (v === null || v === undefined) return '–';
+    if (v === null || v === undefined) return '-';
     if (/share/i.test(name)) return fmtPct(v);
     if (/USD/.test(name)) return fmtUsd(v);
     if (/min\)|Runs|errors|Agents|Turns/.test(name)) return Number.isInteger(v) ? String(v) : v.toFixed(1);
     return fmtTokens(v);
   };
   out.push(table(['Measure', 'A', 'B', 'Change'], rows.map(r => [
-    r.name, fmt(r.name, r.a), fmt(r.name, r.b), r.change === null ? '–' : (r.change > 0 ? '+' : '') + fmtPct(r.change),
+    r.name, fmt(r.name, r.a), fmt(r.name, r.b), r.change === null ? '-' : (r.change > 0 ? '+' : '') + fmtPct(r.change),
   ])));
-  const typesOf = s => s.agentTypes.map(t => `${t.type} ×${t.agents}`).join(', ');
+  const typesOf = s => s.agentTypes.map(t => `${t.type} x${t.agents}`).join(', ');
   out.push(`A agent types: ${typesOf(a)}.\n\nB agent types: ${typesOf(b)}.`);
   return out.join('\n\n') + '\n';
 }

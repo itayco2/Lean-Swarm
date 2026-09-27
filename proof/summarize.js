@@ -118,11 +118,11 @@ export function aggregate(rows, key, baseline = 'plain', excluded = {}) {
 
 const k = n => `${(n / 1000).toFixed(1)}k`;
 const m = n => `${(n / 1e6).toFixed(2)}M`;
-const pct = (x, base) => (base ? `${x >= base ? '+' : '−'}${Math.abs(Math.round(100 * (x / base - 1)))}%` : '–');
-// Percentage points with one decimal; rounds first so floating-point noise never prints as −0.0.
+const pct = (x, base) => (base ? `${x >= base ? '+' : '-'}${Math.abs(Math.round(100 * (x / base - 1)))}%` : '-');
+// Percentage points with one decimal; rounds first so floating-point noise never prints as -0.0.
 export const pp = x => {
   const v = Math.round(1000 * x) / 10;
-  return `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(1)}`;
+  return `${v >= 0 ? '+' : '-'}${Math.abs(v).toFixed(1)}`;
 };
 
 export function markdownSummary(agg, key) {
@@ -134,19 +134,19 @@ export function markdownSummary(agg, key) {
   lines.push('|---|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
   for (const v of agg.variants) {
     if (!v.runs) {
-      lines.push(`| ${v.name} | 0 | all runs left out |${' – |'.repeat(10)}`);
+      lines.push(`| ${v.name} | 0 | all runs left out |${' - |'.repeat(10)}`);
       continue;
     }
-    const ci = v.recallVsBase ? `${pp(v.recallVsBase.diff)} (${pp(v.recallVsBase.low)} to ${pp(v.recallVsBase.high)})` : '–';
+    const ci = v.recallVsBase ? `${pp(v.recallVsBase.diff)} (${pp(v.recallVsBase.low)} to ${pp(v.recallVsBase.high)})` : '-';
     const vs = field => (v.name === agg.baseline || !base ? '' : ` (${pct(v[field], base[field])})`);
-    lines.push(`| ${v.name} | ${v.runs} | ${(v.recall * n).toFixed(1)}/${n} (${Math.round(v.recallRange[0] * n)}–${Math.round(v.recallRange[1] * n)}) | ${ci} | ${(v.recallAll * key.bugs.length).toFixed(1)}/${key.bugs.length} | ${v.other.toFixed(1)} | ${v.decoyHits} | ${m(v.read)}${vs('read')} | ${k(v.perTurn)}${vs('perTurn')} | ${v.turns.toFixed(1)} | $${v.cost.toFixed(2)}${vs('cost')} | ${v.minutes.toFixed(1)} min${vs('minutes')} | ${k(v.firstTurn)} |`);
+    lines.push(`| ${v.name} | ${v.runs} | ${(v.recall * n).toFixed(1)}/${n} (${Math.round(v.recallRange[0] * n)}-${Math.round(v.recallRange[1] * n)}) | ${ci} | ${(v.recallAll * key.bugs.length).toFixed(1)}/${key.bugs.length} | ${v.other.toFixed(1)} | ${v.decoyHits} | ${m(v.read)}${vs('read')} | ${k(v.perTurn)}${vs('perTurn')} | ${v.turns.toFixed(1)} | $${v.cost.toFixed(2)}${vs('cost')} | ${v.minutes.toFixed(1)} min${vs('minutes')} | ${k(v.firstTurn)} |`);
   }
   lines.push('');
   lines.push('Per-bug found rate:');
   lines.push('');
   lines.push(`| Bug | ${agg.variants.map(v => v.name).join(' | ')} |`);
   lines.push(`|---|${agg.variants.map(() => '---:').join('|')}|`);
-  for (const b of key.bugs) lines.push(`| ${b.id}${b.ambiguous ? ' (ambiguous)' : ''} | ${agg.variants.map(v => (v.runs ? `${v.perBug[b.id]}/${v.runs}` : '–')).join(' | ')} |`);
+  for (const b of key.bugs) lines.push(`| ${b.id}${b.ambiguous ? ' (ambiguous)' : ''} | ${agg.variants.map(v => (v.runs ? `${v.perBug[b.id]}/${v.runs}` : '-')).join(' | ')} |`);
   for (const b of ambiguous) lines.push('', `${b.id} is ambiguous: ${b.ambiguous}.`);
   const flags = [];
   for (const v of agg.variants) {
