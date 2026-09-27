@@ -1,20 +1,41 @@
 # Lean-Swarm
 
-**See where your Claude Code multi-agent runs spend tokens and time, and cut the biggest cause.**
+**See where your Claude Code multi-agent runs spend tokens, and cut them without making the agents worse.**
 
 > "Lean-Swarm" is a working name.
 
-When Claude Code runs several agents at once (workflows or parallel subagents), almost none of the tokens are the agents' own work. Measured across 203 workflow runs and 2,121 agents on one heavy setup:
+When Claude Code runs several agents at once (workflows or parallel subagents), almost none of the tokens are the agents' own work. Measured with X-ray across 254 runs and 2,459 agents on one heavy setup (2026-09-26):
 
-- **8.08 billion tokens read, 6.8 million written.** Agents mostly re-read context.
-- **43% of all tokens read is each agent's fixed start:** tool definitions, instruction files and listings, loaded before the task and re-read on every turn.
-- **A default agent's first turn was 68k tokens. The task in it was about 2k.**
-- **Agents never called most of what they loaded:** Artifact 0% of agents, Skill 0.2%, browser tools 3%.
+- **10.25 billion tokens read, 72 million written (0.7%).** Agents mostly re-read context.
+- **41% of all tokens read is each agent's fixed start:** tool definitions, instruction files and listings, loaded before the task and re-read on every turn.
+- **A default workflow agent's first turn was 52–69k tokens. The task in it was about 1k.**
+- **Agents never called most of what they loaded:** Artifact 0% of agents, Skill 0.2%, browser tools 4%.
+- **70% of agents ran 10 or more turns, and they read 97% of all tokens.**
 
-This repo has two parts:
+This repo has three parts:
 
-1. **X-ray,** a command that shows the same numbers for your own runs.
-2. **Lean roles,** five agent types that load only the tools they use.
+1. **X-ray,** a command that shows these numbers for your own runs, and predicts what lean roles would save.
+2. **Lean roles,** five agent types that load only what they use.
+3. **A proof kit** that runs a real multi-agent workflow both ways on code with planted bugs, and measures tokens, cost, time and bugs found.
+
+## Results
+
+Same 7-agent review workflow (3 reviewers → 3 checkers → 1 judge), same prompts, default agents vs lean roles, Opus 5.5:
+
+| | Short agents (2–3 turns each) | Long agents (reviewers ran 8–30 turns, median about 17; 15k-line codebase) |
+|---|---|---|
+| Runs | 2–3 per side, 3 rounds | 12 default vs 5 with the current roles |
+| Bugs found | all, both sides, every run | **all 12 unambiguous bugs, both sides, every run** |
+| False alarms on decoys | 0 | 0 |
+| Tokens read per run | **−59% to −83%** | **−52%** |
+| Tokens read per turn | – | **−47%** |
+| Cost (API prices) | −36% to −62% | **−38%** |
+| Wall-clock | +12% to +16% (slower) | no clear change (−14% pooled, within run-to-run noise) |
+
+- **Long agents are what matter:** they read 97% of the tokens in real use. They save less than short ones because more of what they re-read is their own tool output, not the fixed start.
+- **Quality:** a 13th planted bug had an ambiguous spec (its JSDoc doesn't state the rule it breaks). Default agents reported it twice, both in the first 3 runs; nobody reported it in the 40 runs after. No supported difference. Details and limits: [quality series](docs/proof/2026-09-27-quality-series.md).
+- **Coding:** lean coders finishing a small library passed all 112 hidden checks in every run, like default agents, with 53% fewer tokens and 35% lower cost (2 runs each).
+- **X-ray predicted the saving per turn from the default runs alone,** and the measured saving fell inside its range in every round (long agents: 23.6k–50.5k predicted, 49k measured). The long-agent total came out a little above its predicted 22–47%, because the lean runs also took fewer turns.
 
 ## X-ray
 
@@ -37,37 +58,22 @@ Or from a clone: `node bin/lean-swarm.js xray`.
 
 The report covers tokens by kind, the fixed start and what fills it, which tools agents actually call, where the time goes, duplicate reads across agents, models, and **what lean roles would save on your runs**. Every number is defined in [docs/method.md](docs/method.md).
 
-Excerpt from a real 4-agent run in a Claude Code on the web session:
-
-```
-- Fixed start of each turn: 93% of all tokens read.
-- Same file or URL read by 2+ agents in one run: median 75% of reads.
-
-| Agent type        | Agents | Fits role    | Median start | Saved per turn | Tokens read saved |
-|-------------------|-------:|--------------|-------------:|---------------:|------------------:|
-| statusline-setup  |      1 | judge (100%) |         8.7k |              0 |                 0 |
-| Explore           |      1 | judge (100%) |        34.0k |    7.5k–28.2k  |      15.0k–56.5k  |
-| workflow-subagent |      1 | judge (100%) |        45.1k |    7.5k–39.8k  |      15.0k–79.6k  |
-```
-
-Claude Code 2.1.282 no longer logs tool definitions, so on newer logs the saving is a range. On 2.1.250 logs it's exact.
-
 ## Lean roles
 
-| Role | Tools | Use for |
-|---|---|---|
-| `reader` | Read, Grep, Glob | mapping and understanding |
-| `researcher` | WebSearch, WebFetch, Read, Grep, Glob, Bash | web and paper research |
-| `coder` | Read, Grep, Glob, Edit, Write, Bash | building and fixing |
-| `reviewer` | Read, Grep, Glob, Bash | review and audit |
-| `judge` | Read | verdicts and synthesis |
+| Role | Tools | Starts without CLAUDE.md and rules | Use for |
+|---|---|:---:|---|
+| `reader` | Read, Grep, Glob | | mapping and understanding |
+| `researcher` | WebSearch, WebFetch, Read, Grep, Glob, Bash | | web and paper research |
+| `coder` | Read, Grep, Glob, Edit, Write, Bash | | building and fixing |
+| `reviewer` | Read, Grep, Glob, Bash | ✓ | review and audit |
+| `judge` | Read | ✓ | verdicts and synthesis |
 
-A tools allowlist also drops the skill listing and the deferred-tool listing, so the start shrinks much more than the tools alone. Measured first turns:
+A tools allowlist also drops the skill listing and the deferred-tool listing, so the start shrinks much more than the tools alone. `reviewer` and `judge` also set `omitClaudeMd`, which drops your CLAUDE.md files and `~/.claude/rules` files from their start; they passed the quality test with it. Measured first turns:
 
-| Setup | Default agent | With an allowlist |
-|---|---:|---:|
-| Heavy local setup, CLI 2.1.250, with CLAUDE.md files | 68k | 29k (4 tools) |
-| Claude Code on the web, CLI 2.1.282, 225 deferred tools | 45.1k | 8.7k (2 tools) |
+| Setup | Default agent | Allowlist | Allowlist + `omitClaudeMd` |
+|---|---:|---:|---:|
+| Heavy local setup, Claude Code 2.1.281 | 52.3k | 18.9k | **5.6k** |
+| Claude Code on the web, 2.1.282, 225 deferred tools | 45.1k | 8.7k | – |
 
 **Install:**
 
@@ -80,38 +86,45 @@ Then start a new session: agent definitions load only when a session starts.
 
 **Use:** in a workflow, `agent(prompt, { agentType: 'lean-swarm:reviewer' })`. In chat, ask Claude to use the `lean-swarm:reader` agent.
 
-**Why it doesn't lower quality:** a role removes only tools the agent doesn't use, and structured output still works (checked). Every role keeps your instruction files. The honest caveat is agents that used PowerShell or a browser tool: they'll use Bash or WebFetch instead.
+**What to know:**
+
+- A role removes only tools the agent doesn't use, and structured output still works (checked). Agents that used PowerShell or a browser tool will use Bash or WebFetch instead.
+- `reviewer` and `judge` don't see your CLAUDE.md. If your project's CLAUDE.md holds context a reviewer needs, put it in the task prompt, or use `reader` or `coder`, which keep it.
+- `omitClaudeMd` needs Claude Code 2.1.271 or later; older versions ignore it and load the files as before.
 
 ## Proof
 
-A 7-agent code-review workflow (3 reviewers → 3 checkers → 1 judge) was run on libraries with planted bugs, alternating default agents and lean roles, with identical prompts. Claude Code on the web, Opus 5.5:
+| Round | Where | Agents | Runs | Write-up |
+|---|---|---|---:|---|
+| 1 | Claude Code on the web | short (2–3 turns), 6 easy bugs | 2+2 | [round 1](docs/proof/2026-09-25-review.md) |
+| 2 | Claude Code on the web | short, 11 subtle bugs + 15 decoys | 3+3 | [round 2](docs/proof/2026-09-25-review-round2.md) |
+| local | Windows, heavy setup | short, round-2 target | 3+3 | [local](docs/proof/2026-09-26-local-review.md) |
+| 4 | Windows, heavy setup | long (reviewers 15–27 turns), date-fns with 13 planted bugs + 6 decoys | 3+3 | [long agents](docs/proof/2026-09-26-long-agents.md) |
+| 5 | Windows, heavy setup | long, five variants in rotated blocks, plus a firmer nudge on its own | 37 | [quality series](docs/proof/2026-09-27-quality-series.md) |
 
-| | Round 1: 6 bugs, 2 runs each | Round 2: 11 subtler bugs + 15 decoys, 3 runs each |
-|---|---|---|
-| Bugs found, plain / lean | 6/6 every run / 6/6 every run | 11/11 every run / 11/11 every run |
-| False alarms | 0 / 0 | 0 / 0 (no decoy flagged) |
-| Tokens read per run | 813.6k → 140.1k (**−83%**; noise 1%) | 849.7k → 197.5k (**−77%**; noise 0–6%) |
-| First turn | 47.9k → 5.6k | 44.6k → 6.7k |
-| API-price equivalent | −62% (noise 23%) | −36% (noise 0–25%) |
-| Wall-clock | **+16% (slower)** | **+12% (slower)** |
+The kit to rerun any of it on your own setup, and to test your own changes as extra variants, is in [proof/](proof/).
 
-- **Quality held,** but both variants found everything, so this shows no loss on these tasks. It can't rule out a small loss on harder work.
-- **Lean was about 10–15% slower.** Its agents thought more (up to 80% more thinking tokens in the verify stage); it isn't the tools or the effort setting.
-- **X-ray predicted the saving** from the plain runs alone, and the measured result fell inside its range both times.
-- **These agents were short** (2–3 turns), so the fixed start was ~90% of their reading. On longer real agents, where it's ~43%, expect roughly 25–37% fewer tokens read.
+## What we tested that doesn't pay
 
-Details: [round 1](docs/proof/2026-09-25-review.md), [round 2](docs/proof/2026-09-25-review-round2.md). The kit to rerun it on your own setup is in [proof/](proof/).
+Measured on the long-agent runs, the real workflow history and the quality series ([decision 0003](docs/decisions/0003-next-levers.md)):
+
+- **Trimming large tool outputs (keep the head and tail):** in review work the big outputs are the code being reviewed. 24–35% of outputs over 8k characters held a line the agent later relied on, and 38% of round-4 findings were never visible in the part a 4k+4k trim keeps. The safe part (builds, tests, git, listings) is worth 0.2–1.5% of cost.
+- **Clearing old tool results mid-run:** 0 of 108 simulated policies saved money. On Opus 5.5 clearing forces a cache rewrite at $5 per million tokens to save reads at $0.20.
+- **A 1-hour cache for subagents:** +37% cost per run; no agent paused longer than 93 seconds.
+- **Nudging agents to batch tool calls:** a hook after each one-call turn raised batched turns from 2% to 20% and cut turns by 13%, but batched turns read more, and cost didn't fall (5 runs each).
 
 ## Limits
 
-- **Anthropic is fixing parts of this.** `omitClaudeMd` shipped in 2.1.271, and requests to trim subagent context are open. Lean roles may matter less over time. X-ray stays useful either way.
-- **Savings depend on your setup.** Many skills, connectors and MCP servers mean bigger savings; a lean setup saves less. Run X-ray to see yours.
+- **Savings depend on your setup.** Many skills, connectors, MCP servers and large CLAUDE.md or rules files mean bigger savings; a lean setup saves less. Run X-ray to see yours.
+- **Quality was tested on code review at length and on coding briefly,** each on one codebase, with one model. Research agents weren't tested. The kit is there to test yours.
+- **Anthropic is changing this area.** `omitClaudeMd` shipped in 2.1.271, and requests to trim subagent context are open. X-ray stays useful either way.
 - **Single-session chat gains little.** Other tools cover that.
+- **The name "Token-Optimizer" is also used by an unrelated project** (alexgreensh/token-optimizer). The public name isn't settled.
 
 ## More
 
 - [Design spec](docs/superpowers/specs/2026-09-25-lean-swarm-design.md) and [build plan](docs/superpowers/plans/2026-09-25-lean-swarm-v1.md)
-- [Decisions](docs/decisions/)
+- [Decisions](docs/decisions/) and [related projects](research/landscape.md)
 - [Baseline prototype scripts](research/baseline-2026-09-25/)
 
 ## Development
