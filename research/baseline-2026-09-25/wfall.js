@@ -1,7 +1,7 @@
 // Scan every finished workflow run on disk; per run: agents, turns, tokens, fixed-prefix share,
 // cross-agent duplicate reads (same file/URL read by 2+ agents), models, longest agent.
 const fs = require('fs'), path = require('path');
-const ROOT = 'C:/Users/itay7/.claude/projects';
+const ROOT = path.join(require('os').homedir(), '.claude', 'projects');
 const runs = [];
 for (const proj of fs.readdirSync(ROOT)) {
   const p = path.join(ROOT, proj); if (!fs.statSync(p).isDirectory()) continue;
@@ -47,7 +47,7 @@ for (const r of runs) {
   const keys = Object.keys(reads); const dupKeys = keys.filter(k => reads[k] > 1);
   const totalReads = Object.values(reads).reduce((a, b) => a + b, 0); const dupReads = dupKeys.reduce((a, k) => a + reads[k] - 1, 0);
   const w = { cr: 0.1 * cr, cw: 1.25 * cw, out: 5 * outT }; const wt = w.cr + w.cw + w.out + (ctx - cr - cw);
-  out.push({ run: r.proj.replace(/^C--Users-itay7-Desktop-/, '').slice(0, 22) + '/' + r.id.slice(3, 11), agents: files.length, turns, ctxM: ctx / 1e6, outK: outT / 1e3,
+  out.push({ run: r.proj.replace(/^[A-Za-z]--Users-[^-]+-(Desktop-)?/, '').slice(0, 22) + '/' + r.id.slice(3, 11), agents: files.length, turns, ctxM: ctx / 1e6, outK: outT / 1e3,
     fixedPct: 100 * fixed / Math.max(ctx, 1), crCostPct: 100 * w.cr / Math.max(wt, 1), dupPct: totalReads ? 100 * dupReads / totalReads : 0, maxMin,
     opus: Math.round(100 * Object.entries(models).filter(([m]) => /opus/.test(m)).reduce((a, [, v]) => a + v, 0) / Math.max(1, Object.values(models).reduce((a, b) => a + b, 0))),
     kinds: Object.entries(kinds).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => k + 'x' + v).join(' ') });

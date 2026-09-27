@@ -1,6 +1,6 @@
 // (1) Which tools do workflow agents actually call? (2) Where does wall-clock go: model vs each tool?
 const fs = require('fs'), path = require('path');
-const ROOT = 'C:/Users/itay7/.claude/projects';
+const ROOT = path.join(require('os').homedir(), '.claude', 'projects');
 const used = {}, time = {}; let agents = 0, turns = 0, calls = 0, turnsOneCall = 0;
 const GAP_CAP = 30 * 60 * 1000; // ignore gaps over 30 min (machine asleep / paused)
 for (const proj of fs.readdirSync(ROOT)) {

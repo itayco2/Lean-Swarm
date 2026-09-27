@@ -1,6 +1,6 @@
 // What fills the first turn of each workflow agent? Components in chars (unescaped) vs first-turn tokens.
 const fs = require('fs'), path = require('path');
-const ROOT = 'C:/Users/itay7/.claude/projects';
+const ROOT = path.join(require('os').homedir(), '.claude', 'projects');
 const len = v => typeof v === 'string' ? v.length : Array.isArray(v) ? v.reduce((a, x) => a + len(x), 0) : v && typeof v === 'object' ? Object.values(v).reduce((a, x) => a + len(x), 0) : 0;
 const attTypes = {}, fileSizes = {}, toolSizes = {}; const rows = [];
 for (const proj of fs.readdirSync(ROOT)) {
