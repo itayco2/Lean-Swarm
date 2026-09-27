@@ -1,0 +1,185 @@
+{
+ "target": "date-fns 2.30.0 esm, planted by proof/target-4/setup.js",
+ "window": 3,
+ "bugs": [
+  {
+   "id": "todate-no-clone",
+   "lens": "state",
+   "file": "toDate/index.js",
+   "line": 40
+  },
+  {
+   "id": "startofweek-same-day",
+   "lens": "logic",
+   "file": "startOfWeek/index.js",
+   "line": 44
+  },
+  {
+   "id": "eachday-drops-end",
+   "lens": "logic",
+   "file": "eachDayOfInterval/index.js",
+   "line": 51
+  },
+  {
+   "id": "overlap-inclusive-asymmetric",
+   "lens": "logic",
+   "file": "areIntervalsOverlapping/index.js",
+   "line": 70
+  },
+  {
+   "id": "addmonths-no-clamp",
+   "lens": "logic",
+   "file": "addMonths/index.js",
+   "line": 46,
+   "ambiguous": "the JSDoc does not state the end-of-month rule; only the code comments do"
+  },
+  {
+   "id": "nextday-same-day",
+   "lens": "logic",
+   "file": "nextDay/index.js",
+   "line": 30
+  },
+  {
+   "id": "leapyear-400",
+   "lens": "logic",
+   "file": "isLeapYear/index.js",
+   "line": 24
+  },
+  {
+   "id": "quarter-january",
+   "lens": "logic",
+   "file": "getQuarter/index.js",
+   "line": 23
+  },
+  {
+   "id": "isoday-sunday",
+   "lens": "logic",
+   "file": "getISODay/index.js",
+   "line": 27
+  },
+  {
+   "id": "withininterval-end",
+   "lens": "logic",
+   "file": "isWithinInterval/index.js",
+   "line": 52
+  },
+  {
+   "id": "endofweek-nan",
+   "lens": "input",
+   "file": "endOfWeek/index.js",
+   "line": 39
+  },
+  {
+   "id": "eachhour-step-nan",
+   "lens": "input",
+   "file": "eachHourOfInterval/index.js",
+   "line": 51
+  },
+  {
+   "id": "nearestto-range",
+   "lens": "input",
+   "file": "roundToNearestMinutes/index.js",
+   "line": 38
+  }
+ ],
+ "decoys": [
+  {
+   "id": "addmonths-end-of-month",
+   "file": "addMonths/index.js",
+   "lines": [
+    44,
+    44
+   ]
+  },
+  {
+   "id": "closestindex-nan",
+   "file": "closestIndexTo/index.js",
+   "lines": [
+    49,
+    53
+   ]
+  },
+  {
+   "id": "calendardays-round",
+   "file": "differenceInCalendarDays/index.js",
+   "lines": [
+    46,
+    46
+   ]
+  },
+  {
+   "id": "tointeger-booleans",
+   "file": "_lib/toInteger/index.js",
+   "lines": [
+    2,
+    4
+   ]
+  },
+  {
+   "id": "endofweek-diff",
+   "file": "endOfWeek/index.js",
+   "lines": [
+    44,
+    44
+   ]
+  },
+  {
+   "id": "daysinmonth-day-zero",
+   "file": "getDaysInMonth/index.js",
+   "lines": [
+    25,
+    27
+   ]
+  }
+ ],
+ "symptoms": [
+  {
+   "of": "todate-no-clone",
+   "file": "startOfWeek/index.js",
+   "lines": [
+    45,
+    46
+   ]
+  },
+  {
+   "of": "todate-no-clone",
+   "file": "endOfWeek/index.js",
+   "lines": [
+    42,
+    42
+   ]
+  },
+  {
+   "of": "todate-no-clone",
+   "file": "eachDayOfInterval/index.js",
+   "lines": [
+    47,
+    48
+   ]
+  },
+  {
+   "of": "todate-no-clone",
+   "file": "eachDayOfInterval/index.js",
+   "lines": [
+    52,
+    54
+   ]
+  },
+  {
+   "of": "todate-no-clone",
+   "file": "eachHourOfInterval/index.js",
+   "lines": [
+    48,
+    49
+   ]
+  },
+  {
+   "of": "todate-no-clone",
+   "file": "eachHourOfInterval/index.js",
+   "lines": [
+    53,
+    53
+   ]
+  }
+ ]
+}
